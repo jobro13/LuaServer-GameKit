@@ -10,13 +10,17 @@ local libsetting = require "settings/libsetting"
 
 settings = libsetting.GetSettingHandler("settings/settings.txt")
 
+for i,v in pairs(settings) do
+	print(i,v)
+end
+
 local lhtml = require "lhtml"
 
 -- I heard you didnt like PHP
 -- So we use lau
 
 server.IP = settings:get "bind_ip"
-server.Port = tonumber(settings.get "bind_port")
+server.Port = tonumber(settings:get "bind_port")
 
 server.RQs = 0
 

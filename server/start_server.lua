@@ -1,8 +1,8 @@
 
-server = require "server"
-print(3)
+server_o = require "server"
+local server = server_o:new();
 copas = require "copas"
-print(4)
+
 server:Initialize()
 server:Start()
 
