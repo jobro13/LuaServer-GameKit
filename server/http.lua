@@ -1,3 +1,5 @@
+-- HTTP module
+
 local http = {}
 
 -- returns strings only
@@ -14,6 +16,8 @@ http.statuscodes = {
 -- status: status code
 -- headers: table; indices = header value; values = their values
 -- content = http content field
+-- conn: the LuaSocket connection
+-- writef: the write function (provided by copas, or use your own)
 function http.response(status,headers,content, conn, writef)
 	local out = ""
 	out = "HTTP/"..http.httpversion.." "..status.." ".. (http.statuscodes[tonumber(status) or ""] or "WAT") .."\r\n"
@@ -35,11 +39,9 @@ function http.getremheader(conn, readf)
 
 	while line and line ~= "" and line ~= "\r\n" do 
 		line = readf(conn, "*l")
-		print("Line eval", line )
 		local option, value = line:match("([^:]*) (.*)")
 		if option and value then 
 			out[option] = value 
-			print("hellu", option:len(), option, value)
 		end 
 	end 
 	return out 
@@ -47,16 +49,14 @@ end
 
 
 -- reads from conn with provided read function
--- until content lenght is found; that is returned as number
+-- until content length is found; that is returned as number
 function http.getclen(conn, readf)
 	local pat = "Content-Length: (%d+)\r\n"
 	local this 
 	local line = ""
 	while (not this) and line ~= "" and line ~= "\r\n" do 
 		line = readf(conn, "*l")
-		print(line, line:len(), line == "", line == "\0")
 		this = line:match(pat)
-		print((not this) or line == "")
 	end 
 	return this 
 end

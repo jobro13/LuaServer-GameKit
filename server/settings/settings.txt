@@ -1,0 +1,18 @@
+% settings.txt;
+% every line starting with % is ignored
+% usage:
+% SETTING_NAME = VALUE
+% lua uses a pattern match so it's okay to use more whitespace than necessary
+% you can use the utility located in ./utilities named "interactive_settings.lua to read and write on setting files in an interactive way"
+
+
+% IP ADRESSES
+bind_ip = 192.168.1.5 				% IP adress to bind to
+bind_port = 80						% PORT to bind to
+
+% web dir
+webdir = ".web"
+
+% SPECIAL PAGES
+page_404 = "/404.lua"
+page_home = "/index.lua"

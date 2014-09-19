@@ -1,3 +1,7 @@
+-- Table serializer (recursive)
+-- Well not really a serializer.. was intended to be. Only table -> string now
+-- VERY handy for analysis! (look at those colors!!)
+
 local serialize = {}
 
 serialize.midstr = " = "

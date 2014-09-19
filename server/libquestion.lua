@@ -1,3 +1,6 @@
+-- Question library to answer questions in a quick way
+-- Handles "wrong" answers, but asks if nearest answer is ok
+
 local libq = {}
 
 function libq.GetClosedAnswer(question)

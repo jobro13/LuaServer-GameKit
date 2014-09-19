@@ -1,3 +1,5 @@
+-- Ansicolors color module!
+
 term={ 
         output=io.write, 
         clear = function () term.output("\027[2J") end, 

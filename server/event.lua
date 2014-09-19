@@ -1,3 +1,5 @@
+-- Lua events
+
 local Event = {}
 
 function Event:Call()

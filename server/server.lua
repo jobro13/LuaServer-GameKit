@@ -6,22 +6,24 @@ local prettyprint = require "prettyprint"
 local http = require "http"
 local lfs = require "lfs"
 local event = require "event"
+local libsetting = require "settings/libsetting"
+
+settings = libsetting.GetSettingHandler("settings/settings.txt")
 
 local lhtml = require "lhtml"
 
 -- I heard you didnt like PHP
 -- So we use lau
 
-
-server.IP = "130.89.182.106"
-server.Port = 80 
+server.IP = settings:get "bind_ip"
+server.Port = tonumber(settings.get "bind_port")
 
 server.RQs = 0
 
-server.webdir = "./web"
+server.webdir = settings:get "webdir"
 
-server.home = "/index.lua"
-server["404"] = "/404.lua"
+server.home = settings:get "page_404"
+server["404"] = settings:get "page_home"
 
 function server:new()
 	return setmetatable({}, {__index=self})
@@ -30,25 +32,24 @@ end
 function server:Initialize()
 
 	self.socket = socket.tcp()
-	prettyprint.write("server", "info", "Starting server...")
-	local ok, err = self.socket:bind("127.0.0.1",80)
+	prettyprint.write("server", "info", "Starting server on " .. self.IP .. ":" .. self.Port)
+	local ok, err = self.socket:bind(self.IP, self.Port)
 	if ok then 
-		prettyprint.write("server", "info", "Server online!")
+		prettyprint.write("server", "info", "OK: Server has bound to ip and port!")
 	else 
-		prettyprint.write("server", "error", "Server error: "..tostring(err))
+		prettyprint.write("server", "error", "Server not online, error: "..tostring(err))
 		os.exit()
 	end 
 	local listen = self.socket:listen()
 	if listen then 
-		prettyprint.write("server", "info", "Server is listening.")
+		prettyprint.write("server", "info", "OK: Server is online.")
 	end 
 	copas.addserver(self.socket, function(...) self.handle(self, ...) end)
 end
 
 function server:Start()
-	print(1)
+	prettyprint.write("server", "info", "Waiting for a connection ... ")
 	while true do
-	print(2) 
 		copas.step()
 	end 
 end
@@ -61,7 +62,7 @@ function server:getpage(page, ...)
 	local i,err = io.open(self.webdir .. page, "r")
 	prettyprint.write("server", "info", page .. " open: " .. tostring(i))
 	if not i then 
-		prettyprint.write("server", "error", "fopen: " .. err)
+		prettyprint.write("server", "error", "File open error: " .. err)
 		return nil
 	end
 	if page:match("%.lua$") then 
@@ -110,7 +111,6 @@ server.handle = function(self,conn, efc, tr)
 					prettyprint.write("server", "info", "Content, sending ... " ) 
 					rq = http.response(200, headers, self:getpage(page) )
 				else 
-					print("in loop")
 					rq = http.response(404, nil, self:getpage(self["404"]))
 				end
 			end

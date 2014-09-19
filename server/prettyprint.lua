@@ -1,3 +1,6 @@
+-- Prettyprint module
+-- Yay.
+
 local color = require "color"
 
 -- We want pretty output
