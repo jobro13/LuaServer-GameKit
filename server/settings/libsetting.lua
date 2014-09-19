@@ -16,12 +16,12 @@ function settings.GetSettingHandler(filename)
 	local o = {}
 	setmetatable(o, 
 		{__index = settings})
-	for line in io.lines(filename) do 
-		print(line)
-		if not line:sub(1,1) == "%" then 
-			print "ok"
-			local sname, svalue = line:match("([^=]*)=%s*(.*)%s*%%?")
-			print(sname, svalue)
+	f = f:read("*all")
+	for line in f:gmatch("[^\n]+") do 
+		if not (line:sub(1,1) == "%") then 
+			local sname, svalue = line:match("^%s*(.+)%s*=%s*(.+)")
+			svalue = svalue:match("(.*)%%") or svalue 
+			svalue = svalue:match("^(.*)[%s\t]+$") or svalue
 			o[sname] = svalue 
 		end
 	end
