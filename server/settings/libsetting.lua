@@ -19,7 +19,7 @@ function settings.GetSettingHandler(filename)
 	f = f:read("*all")
 	for line in f:gmatch("[^\n]+") do 
 		if not (line:sub(1,1) == "%") then 
-			local sname, svalue = line:match("^%s*(.+)%s*=%s*(.+)")
+			local sname, svalue = line:match("^%s*([%S]+)%s*=%s*(.+)")
 			svalue = svalue:match("(.*)%%") or svalue 
 			svalue = svalue:match("^(.*)[%s\t]+$") or svalue
 			o[sname] = svalue 
