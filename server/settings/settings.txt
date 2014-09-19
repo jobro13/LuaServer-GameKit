@@ -11,7 +11,7 @@ bind_ip = 192.168.1.5 				% IP adress to bind to
 bind_port = 80						% PORT to bind to
 
 % web dir
-webdir = .webdir					% Web root directory (/)
+webdir = .web					% Web root directory (/)
 
 % SPECIAL PAGES
 page_404 = /404.lua					% 404 page when page is not found

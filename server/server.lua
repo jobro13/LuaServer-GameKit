@@ -52,8 +52,8 @@ function server:Initialize()
 end
 
 function server:Start()
-	prettyprint.write("server", "info", "Waiting for a connection ... ")
 	while true do
+		prettyprint.write("server", "info", "Waiting for a connection ... ")
 		copas.step()
 	end 
 end
