@@ -69,7 +69,13 @@ function server:getpage(page, ...)
 		prettyprint.write("server", "error", "File open error: " .. err)
 		return nil
 	end
-	if page:match("%.lua$") then 
+	-- Maybe this should move into another module?
+	local page_context =
+		{
+			filetype = page:match("%.(%w)+$")
+		}
+
+	if filetype == "lua" then 
 
 		local content, headers = loadfile(self.webdir .. page)() --loadstring(i:read("*a"))(...)
 		local headers = headers or {}
@@ -77,6 +83,7 @@ function server:getpage(page, ...)
 			headers["Cache-Control"] = "no-cache"
 		end
 		return lhtml.parse(content), headers
+	elseif 
 	else 
 		return i:read("*all"), {["Cache-Control"] = "no-cache"}
 	end
@@ -91,6 +98,7 @@ server.handle = function(self,conn, efc, tr)
 	local cname = "Client " .. id .. " "
 	if request then 
 		local method, page, version = http.getrequest(request)
+		print(page)
 		if method and page and version then 
 			prettyprint.write("server", "info", cname .. method .. " request on page: " .. page .. " (HTTP: "..version..")")
 			--local cl = http.getclen(conn, copas.receive)
@@ -100,9 +108,9 @@ server.handle = function(self,conn, efc, tr)
 				prettyprint.write("server", "info", cname.. " Content Length: ".. tostring(cl) )
 			end
 			local rq
-			if page:match("^%.") or page:match("^//") then
+			if page:match("^%.") or page:match("^//") or page:match("^~") then
 				prettyprint.write("server", "error", "Malicious page request, end." ) 
-				-- oh really...
+				-- oh really... 
 				rq = http.response(404, nil, self:getpage(self["404"]))
 			elseif page == "/" then 
 				prettyprint.write("server", "info", "Redirect to homepage .." ) 
