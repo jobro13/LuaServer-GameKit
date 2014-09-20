@@ -1,0 +1,112 @@
+NOTES
+
+HTML TERMS
+ELEMENTS
+TAGS (OPENING / CLOSING)
+ATTRIBUTES (NAME VALUE)
+VALUES
+
+HTML:
+-> ELEMENT:
+h1
+a
+
+-> TAG:
+<a> </a>
+
+a = element
+<a> = opening tag
+</a> = closing tag
+<a href="bafsf"> </a>
+href = attribute
+"bafsf" = value
+
+
+
+CSS:
+TERMS
+SELECTOR
+PROPERTY
+VALUE
+
+Selector: selects which elements to target
+followed by brackets which define the properties;
+
+p = { }
+
+PROPERTY SAMPLE:
+color: value;
+background: something;
+
+value and something are "values"
+
+
+SELECTORS:
+TYPE SELECTOR: ALL ELEMENTS OF THAT TYPE
+div = { }
+a = {}
+
+CLASS SELECTOR:
+.classname = { }
+
+classname = find all html elements who have the class attribute set to classname and then apply the properties
+
+ID SELECTOR:
+#idname = { }
+FIND THE HTML ELEMENT WHICH HAS THE ID ELEMENT SET TO idname and then apply properties
+
+
+LINKING HTML AND CSS:
+IN HTML -> LINK STYLESHEET
+in head: 
+<link rel="stylesheet" href="main.css">
+SO:
+ELEMENT: LINK
+ATTRIBUTE: REL (RELATIONSHIP) VALUE stylesheet
+ATTRIBUTE href VALUE main.css
+NOTE: /main.css = site.com/main.css
+
+CLASS SELECTION: ADVANCED
+ID > CLASS > TYPE (prio)
+
+.class .otherclass 
+-> select all elements classname class
+--> then select from all remaining classname otherclass
+
+COLORS:
+-> keyword
+-> hex
+-> rgb / hsl / rgba (alpha / transp.)
+
+Length;
+pixels (offset)
+relative::
+%
+em = element font size
+
+
+BOX:
+margin - border - padding - content
+set size:
+1 value : all 4 sides
+2 values: top/bottom, left/right
+4 values: top right bottom left
+
+
+BORDERS:
+color, style, width ARE NECESSRARY
+border: <widht> <style> <color>
+STYLE: a lot, solid, dashed, dotted.. etc
+p {
+	border: 6px solid rgb(0,0,0);
+}
+
+Certain ways of box sizign;
+content-box:
+normal sizing
+padding-box;
+now padding is in the size;
+increasing padding shrinks content
+increasing border only increases border and thus size of element
+border-box;
+border also in size. k.

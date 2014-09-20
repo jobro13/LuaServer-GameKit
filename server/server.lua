@@ -3,7 +3,7 @@ local server = {}
 local copas = require "copas"
 local socket = require "socket"
 local prettyprint = require "prettyprint"
-local http = require "http"
+local page = require "page"
 local lfs = require "lfs"
 local event = require "event"
 local libsetting = require "settings/libsetting"
@@ -14,7 +14,7 @@ for i,v in pairs(settings) do
 	print(i,v)
 end
 
-local lhtml = require "lhtml"
+local lhtml = require "html"
 
 -- I heard you didnt like PHP
 -- So we use lau
@@ -26,8 +26,15 @@ server.RQs = 0
 
 server.webdir = settings:get "webdir"
 
-server.home = settings:get "page_404"
-server["404"] = settings:get "page_home"
+server.home = settings:get "page_home"
+server["404"] = settings:get "page_404"
+
+-- a small function which returns a styled color info message
+-- like [OK], [404]
+local function getcstr(msg, color)
+	return "[%{" .. color .. "}"
+end
+
 
 function server:new()
 	return setmetatable({}, {__index=self})
@@ -62,7 +69,15 @@ end
 -- oh yes copas 
 -- oh yes
 
-function server:getpage(page, ...)
+-- sample http request is;
+-- GET / HTTP/1.1
+--> page = /
+--> method = GET
+--> version = 1.1
+--> ClientHeaders are all remaining headers!
+--> like User-Agent
+
+function server:getpage(page, clientheaders, method, version)
 	local i,err = io.open(self.webdir .. page, "r")
 	prettyprint.write("server", "info", page .. " open: " .. tostring(i))
 	if not i then 
@@ -72,18 +87,19 @@ function server:getpage(page, ...)
 	-- Maybe this should move into another module?
 	local page_context =
 		{
-			filetype = page:match("%.(%w)+$")
+			filetype = page:match("%.(%w+)$")
 		}
 
-	if filetype == "lua" then 
-
-		local content, headers = loadfile(self.webdir .. page)() --loadstring(i:read("*a"))(...)
+	print("file type " .. (page_context.filetype or "wot"))
+	if page_context.filetype == "lua" then 
+		local content, headers = page.generate(self.webdir .. page, clientheaders, method, version)
+		--loadstring(i:read("*a"))(...)
 		local headers = headers or {}
 		if not headers["Cache-Control"] then 
 			headers["Cache-Control"] = "no-cache"
 		end
-		return lhtml.parse(content), headers
-	elseif 
+		return content, headers
+	elseif page_context.filetype == "blasf" then 
 	else 
 		return i:read("*all"), {["Cache-Control"] = "no-cache"}
 	end
@@ -111,19 +127,20 @@ server.handle = function(self,conn, efc, tr)
 			if page:match("^%.") or page:match("^//") or page:match("^~") then
 				prettyprint.write("server", "error", "Malicious page request, end." ) 
 				-- oh really... 
-				rq = http.response(404, nil, self:getpage(self["404"]))
+				rq = http.response(404, nil, self:getpage(self["404"], options, method, version))
 			elseif page == "/" then 
 				prettyprint.write("server", "info", "Redirect to homepage .." ) 
 				rq = http.response(302, {["Location"] = "/index.lua"}, "")
 			else
-				local content, headers = self:getpage(page) 
+				local content, headers = self:getpage(page, options, method, version) 
+				print("content:: ", content)
 				local headers = headers or {}
 				local headers = nil
 				if content then 
 					prettyprint.write("server", "info", "Content, sending ... " ) 
-					rq = http.response(200, headers, self:getpage(page) )
+					rq = http.response(200, headers, self:getpage(page, options, method, version) )
 				else 
-					rq = http.response(404, nil, self:getpage(self["404"]))
+					rq = http.response(404, nil, self:getpage(self["404"], options, method, version))
 				end
 			end
 			if rq then 

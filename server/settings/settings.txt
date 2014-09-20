@@ -7,7 +7,7 @@
 
 
 % IP ADRESSES
-bind_ip = 192.168.1.5 				% IP adress to bind to
+bind_ip = *				% IP adress to bind to
 bind_port = 80						% PORT to bind to
 
 % web dir
