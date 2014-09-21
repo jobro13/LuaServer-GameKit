@@ -16,7 +16,7 @@ html.buffer = "" -- string to write to.
 html.tagdata = {
 	a = {
 			close = true;
-		}
+		},
 	img = {
 			close = false;
 	}

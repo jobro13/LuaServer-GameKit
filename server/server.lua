@@ -32,7 +32,7 @@ server["404"] = settings:get "page_404"
 -- a small function which returns a styled color info message
 -- like [OK], [404]
 local function getcstr(msg, color)
-	return "[%{" .. color .. "}"
+	return "[%{" .. color .. "}" .. msg .. "%{reset}]"
 end
 
 
@@ -92,7 +92,7 @@ function server:getpage(page, clientheaders, method, version)
 
 	print("file type " .. (page_context.filetype or "wot"))
 	if page_context.filetype == "lua" then 
-		local content, headers = page.generate(self.webdir .. page, clientheaders, method, version)
+		local content, headers = page.generate(page, i, clientheaders, method, version)
 		--loadstring(i:read("*a"))(...)
 		local headers = headers or {}
 		if not headers["Cache-Control"] then 
