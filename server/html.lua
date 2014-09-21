@@ -12,6 +12,10 @@ end
 
 html.buffer = "" -- string to write to.
 
+function html.clearbuffer()
+	html.buffer = ""
+end
+
 -- not implemented
 html.tagdata = {
 	a = {
@@ -30,6 +34,8 @@ end
 
 local fcontext = {
 	__call = function(tab,...)
+		print("call " .. tab.Name)
+		--local write = rawget(getfenv(), "write")
 		if tab.Name == "close" then 
 			-- add closing tags..
 			local upname = tab.Parent.Name 
@@ -40,7 +46,13 @@ local fcontext = {
 		end
 	end,
 	__index = function(tab, val)
-		newf()
+		local origval = rawget(getfenv(), val) 
+		if origval then 
+			return origval
+		end
+		print("I want a new index name " .. val )
+		--local newf = rawget(getfenv(), "newf")
+		return newf(val, tab)
 	end
 }
 
@@ -56,7 +68,7 @@ local function newf(name, location, options)
 		return 
 	end
 	local o = {}
-	o.Name = nameof
+	o.Name = name
 	o.Parent = location
 	if options and type(options) == "table" then 
 		for i,v in pairs(options) do 
@@ -65,7 +77,11 @@ local function newf(name, location, options)
 	end
 	setmetatable(o, fcontext)
 	location[name] = o
+	return o
 end
+
+html.newf = newf;
+
 
 setmetatable(html, fcontext)
 

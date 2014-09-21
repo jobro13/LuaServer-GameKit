@@ -7,6 +7,7 @@ local page = require "page"
 local lfs = require "lfs"
 local event = require "event"
 local libsetting = require "settings/libsetting"
+local http = require "http"
 
 settings = libsetting.GetSettingHandler("settings/settings.txt")
 
@@ -14,7 +15,7 @@ for i,v in pairs(settings) do
 	print(i,v)
 end
 
-local lhtml = require "html"
+--local html = require "html"
 
 -- I heard you didnt like PHP
 -- So we use lau
@@ -77,9 +78,9 @@ end
 --> ClientHeaders are all remaining headers!
 --> like User-Agent
 
-function server:getpage(page, clientheaders, method, version)
-	local i,err = io.open(self.webdir .. page, "r")
-	prettyprint.write("server", "info", page .. " open: " .. tostring(i))
+function server:getpage(url, clientheaders, method, version)
+	local i,err = io.open(self.webdir .. url, "r")
+	prettyprint.write("server", "info", url .. " open: " .. tostring(i))
 	if not i then 
 		prettyprint.write("server", "error", "File open error: " .. err)
 		return nil
@@ -87,12 +88,12 @@ function server:getpage(page, clientheaders, method, version)
 	-- Maybe this should move into another module?
 	local page_context =
 		{
-			filetype = page:match("%.(%w+)$")
+			filetype = url:match("%.(%w+)$")
 		}
 
 	print("file type " .. (page_context.filetype or "wot"))
 	if page_context.filetype == "lua" then 
-		local content, headers = page.generate(page, i, clientheaders, method, version)
+		local content, headers = page.generate(url, self.webdir..url, clientheaders, method, version)
 		--loadstring(i:read("*a"))(...)
 		local headers = headers or {}
 		if not headers["Cache-Control"] then 

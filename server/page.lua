@@ -19,7 +19,8 @@ end
 -- file = already opened file
 -- method: GET/POST/ etc
 -- version: 1.1 (http version)
-function page.generate(url, file, headers, method, version)
+function page.generate(url, file_location, headers, method, version)
+	html.clearbuffer()
 	local env = {
 		location = url;
 		headers = headers;
@@ -27,9 +28,13 @@ function page.generate(url, file, headers, method, version)
 		version = version;
 		content = ""
 	}
-	local func = load(file)
+	local func = loadfile(file_location)
 	local meta = getmetatable(html)
-	setmetatable(getfenv(func), meta)
-	return func(url, file, headers, method, version)
+	local wr = getfenv(func)
+	wr.newf = html.newf
+	setmetatable(wr, meta)
+	func(url, headers, method, version)
+	return html.buffer
 end
 
+return page
