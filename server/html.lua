@@ -1,31 +1,72 @@
--- Lua HTML parser -- 
+-- Lua HTML parser
 
--- The idea is as following:
--- We can either add "tables" of elements to our environment
--- Or we can use functions for it;
+-- function constructor
 
--- element {}
+local html = {}
 
+local prettyprint = require "prettyprint"
 
-local lhtml = {}
+function err(msg)
+	prettyprint.write("htmlparse", "error", msg)
+end
 
-local objects = {
-	["a"] = {
-		"href"
+html.buffer = "" -- string to write to.
 
+-- not implemented
+html.tagdata = {
+	a = {
+			close = true;
+		}
+	img = {
+			close = false;
 	}
 
 
 }
 
-function lhtml.parse(data)
-	return data
+function write(str)
+	html.buffer = html.buffer .. str 
 end 
 
-function lhtml.gettag(what, fdata)
+local fcontext = {
+	__call = function(tab,...)
+		if tab.Name == "close" then 
+			-- add closing tags..
+			local upname = tab.Parent.Name 
+			write("</"..upname..">")
+		else
+			local name = tab.Name
+			write("<"..name..">")
+		end
+	end,
+	__index = function(tab, val)
+		newf()
+	end
+}
 
+function fcontext.__newindex(tab, index, value)
+	if type(value) == "function" then 
+		return setmetatable({call = value}, fcontext)
+	end
 end
 
+local function newf(name, location, options)
+	if not name then 
+		err("Name not provided")
+		return 
+	end
+	local o = {}
+	o.Name = nameof
+	o.Parent = location
+	if options and type(options) == "table" then 
+		for i,v in pairs(options) do 
+			o[i] = v
+		end 
+	end
+	setmetatable(o, fcontext)
+	location[name] = o
+end
 
+setmetatable(html, fcontext)
 
-return lhtml
+return html
