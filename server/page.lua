@@ -30,9 +30,10 @@ function page.generate(url, file_location, headers, method, version)
 	}
 	local func = loadfile(file_location)
 	local meta = getmetatable(html)
-	local wr = getfenv(func)
-	wr.newf = html.newf
-	setmetatable(wr, meta)
+	--local wr = getfenv(func)
+	--wr.newf = html.newf
+	--setmetatable(wr, meta)
+	setfenv(func,html)
 	func(url, headers, method, version)
 	print(html.buffer)
 	return html.buffer

@@ -35,6 +35,7 @@ end
 local fcontext = {
 	__call = function(tab,...)
 		print("call " .. tab.Name, rawget(tab, "call"))
+		for i,v in pairs(tab) do print(i,v) end
 		if rawget(tab, "call") then 
 			tab.call(...)
 			return 
@@ -51,12 +52,16 @@ local fcontext = {
 	end,
 	__index = function(tab, val)
 		local origval = rawget(getfenv(), val) 
+		print(origval)
 		if tab == getfenv() or tab == html and origval then 
 			return origval
 		end
 		print("I want a new index name " .. val )
 		--local newf = rawget(getfenv(), "newf")
-		return newf(val, tab)
+		return html.newf(val, tab)
+	end,
+	__newindex = function(tab,ind,val)
+		rawset(tab,ind,val)
 	end
 }
 
@@ -66,7 +71,7 @@ function fcontext.__newindex(tab, index, value)
 	end
 end
 
-local function newf(name, location, options)
+function html.newf(name, location, options)
 	if not name then 
 		err("Name not provided")
 		return 
@@ -84,7 +89,7 @@ local function newf(name, location, options)
 	return o
 end
 
-html.newf = newf;
+local newf = html.newf
 
 local content = newf("content", html)
 function content.call(c)
@@ -93,10 +98,13 @@ function content.call(c)
 end
 
 local doctype = newf("doctype", html)
-function doctype.call(dtype)
+function html.doctype.call(dtype)
+	print("ES")
 	write("<!DOCTYPE " ..dtype ..">")
 end
-
+print ".."
+print(html.doctype == doctype)
+for i,v in pairs(html.doctype) do print(i,v) end
 setmetatable(html, fcontext)
 
 return html
