@@ -34,7 +34,11 @@ end
 
 local fcontext = {
 	__call = function(tab,...)
-		print("call " .. tab.Name)
+		print("call " .. tab.Name, rawget(tab, "call"))
+		if rawget(tab, "call") then 
+			tab.call(...)
+			return 
+		end
 		--local write = rawget(getfenv(), "write")
 		if tab.Name == "close" then 
 			-- add closing tags..
@@ -47,7 +51,7 @@ local fcontext = {
 	end,
 	__index = function(tab, val)
 		local origval = rawget(getfenv(), val) 
-		if origval then 
+		if tab == getfenv() or tab == html and origval then 
 			return origval
 		end
 		print("I want a new index name " .. val )
@@ -82,6 +86,16 @@ end
 
 html.newf = newf;
 
+local content = newf("content", html)
+function content.call(c)
+	print("yes, content")
+	write(c)
+end
+
+local doctype = newf("doctype", html)
+function doctype.call(dtype)
+	write("<!DOCTYPE " ..dtype ..">")
+end
 
 setmetatable(html, fcontext)
 

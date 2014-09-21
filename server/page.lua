@@ -34,6 +34,7 @@ function page.generate(url, file_location, headers, method, version)
 	wr.newf = html.newf
 	setmetatable(wr, meta)
 	func(url, headers, method, version)
+	print(html.buffer)
 	return html.buffer
 end
 

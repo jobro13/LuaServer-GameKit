@@ -50,7 +50,14 @@ function server:Initialize()
 		prettyprint.write("server", "info", "OK: Server has bound to ip and port!")
 	else 
 		prettyprint.write("server", "error", "Server not online, error: "..tostring(err))
-		os.exit()
+		print("Do you want to specify another port or?")
+		if io.read():sub(1,1):lower() == "y" then 
+			print("Specify port.")
+			server.Port = io.read("*n")
+			server:Initialize()
+		else 
+			os.exit()
+		end
 	end 
 	local listen = self.socket:listen()
 	if listen then 
