@@ -20,15 +20,15 @@ sample = [=[<html>
 for i,v in pairs(getfenv()) do print(i,v,7) end
 print(doctype,'HI')
 doctype "html"
-html()
-head()
-title()
+html.open()
+head.open()
+title.open()
 content "Not Found"
 title.close()
 head.close()
-body()
-b.close {content = "Page not found ..."} -- add elements, then close.
-a.close {href = "/index.lua"; content = "Return home"}
+body.open()
+b.close {content = "Page not found ...", open = true} -- add elements, then close.
+a.close {href = "/index.lua"; content = "Return home", open=true}
 body.close()
 html.close()
 

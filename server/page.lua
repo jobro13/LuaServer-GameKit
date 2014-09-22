@@ -28,14 +28,17 @@ function page.generate(url, file_location, headers, method, version)
 		version = version;
 		content = ""
 	}
-	local func = loadfile(file_location)
+	local func,err = loadfile(file_location)
+	if err then 
+		prettyprint.write("pagegen", "error", "error opening file: " .. err)
+	end
 	local meta = getmetatable(html)
 	--local wr = getfenv(func)
 	--wr.newf = html.newf
 	--setmetatable(wr, meta)
 	setfenv(func,html)
 	func(url, headers, method, version)
-	print(html.buffer)
+	--print(html.buffer)
 	return html.buffer
 end
 

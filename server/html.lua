@@ -32,43 +32,74 @@ function write(str)
 	html.buffer = html.buffer .. str 
 end 
 
+-- optlist; list of things to do
+-- ex {href = "wot"}
+-- parent is the parent object
+-- it is possible to traverse parent objects too yay
+--  Name is the object name
+
 function optparse(optlist,Parent,Name)
 	-- this has to be done in order.
 	-- so we cant use pairs 
 
 	-- REMOVE ENTRIES FROM TABLE?
-	if oplist.open then -- also include an open tag
-		write("<"..Name..">")
+	local opened = false
+	local wrotespace = false
+	if optlist.open then -- also include an open tag
+		write("<"..Name)
+		opened = true 
 	end
 	local got = {
 		content = true;
 		open = true;
+		close = true;
+		fclose = true;
 	}	
 	-- okay now we are done!
-	local wrotehead = false 
+	--print(Name)
 	local partbuff = ""
 	for i,v in pairs(optlist) do 
+		print(i,v)
 		if not got[i] then 
-			if not wrotehead then 
-				wrotehead = true 
-				partbuff = partbuff .. "<" .. Name .. " "
+			if not opened then 
+				opened = true 
+				write("<"..Name.." ")
+				wrotespace = true
+			end
+			if not wrotespace then 
+				write(" ")
+				wrotespace = true
 			end
 			partbuff = partbuff .. i .. "=\""..v.."\""
 		end
 	end
-	partbuff = partbuff .. ">"
-	write(partbuff)
+	print(Name, optlist.open)
+	if partbuff ~= "" or optlist.open then 
+		print("->")
+		partbuff = partbuff .. ">"
+		write(partbuff)
+	end
 	if optlist.content then 
 		write(optlist.content)
 	end
 
+	if optlist.close then 
+		write("</"..Name..">")
+	elseif optlist.fclose then 
+		print(Name, Name:len(), "HI")
+		write("</"..Name..">")
+	end
 end
 
 local fcontext = {
 	__call = function(tab,...)
-		print("call " .. tab.Name, rawget(tab, "call"))
+	--	print("call " .. tab.Name, rawget(tab, "call"))
 		local args = {...}
-		for i,v in pairs(tab) do print(i,v) end
+		local options = args[1]
+		if type(options) == "string" then
+			options = {content = options}
+		end
+	
 		if rawget(tab, "call") then 
 			tab.call(...)
 			return 
@@ -76,24 +107,33 @@ local fcontext = {
 		--local write = rawget(getfenv(), "write")
 		if tab.Name == "close" then 
 			-- add closing tags..
-			local upname = tab.Parent.Name 
-			local options = args[1]
+			local upname = tab.Parent
 			if type(options) == "table" then 
-				optparse(options, upname, tab.Name)
+				-- force close.
+				options.fclose = true
+			
+				optparse(options, upname.Parent, upname.Name)
+			else 
+				print(upname.Name, "CLOSING")
+				optparse({fclose = true}, upname.Parent, upname.Name)
 			end
-			write("</"..upname..">")
+		elseif tab.Name == "full" then 
+			local options = options or {}
+			options.open = true
+			tab.Parent.close(options)
+		elseif tab.Name == "open" then 
+			optparse({open = true}, tab.Parent.Parent, tab.Parent.Name)
 		else
-			local name = tab.Name
-			write("<"..name..">")
+			optparse(options or {}, tab.Parent, tab.Name)
 		end
 	end,
 	__index = function(tab, val)
 		local origval = rawget(getfenv(), val) 
-		print(origval)
+	--	print(origval)
 		if tab == getfenv() or tab == html and origval then 
 			return origval
 		end
-		print("I want a new index name " .. val )
+	--	print("I want a new index name " .. val )
 		--local newf = rawget(getfenv(), "newf")
 		return html.newf(val, tab)
 	end,
@@ -130,7 +170,7 @@ local newf = html.newf
 
 local content = newf("content", html)
 function content.call(c)
-	print("yes, content")
+	print("yes, content", c)
 	write(c)
 end
 
