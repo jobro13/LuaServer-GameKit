@@ -27,7 +27,7 @@ content "Not Found"
 title.close()
 head.close()
 body()
-b.close { content = "Page not found ..."} -- add elements, then close.
+b.close {content = "Page not found ..."} -- add elements, then close.
 a.close {href = "/index.lua"; content = "Return home"}
 body.close()
 html.close()
