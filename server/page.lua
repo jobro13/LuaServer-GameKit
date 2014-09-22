@@ -42,13 +42,27 @@ end
 function page.get(url, root, headers, method, version)
 	-- pagegen detector stuff here
 	local file_location = root .. url
-	local func,err = loadfile(file_location)
-	if err then 
-		prettyprint.write("pagegen", "error", "error opening file: " .. err)
-		return nil
+	local typeof = file_location:match("(%.%w+)$")
+	local content, headers, status
+	if typeof == ".lua" then 
+		local func,err = loadfile(file_location)
+		if err then 
+			--prettyprint.write("pagegen", "error", "error opening file: " .. err)
+			return nil
+		end
+		content, headers, status = page.generate(url, func, headers, method, version)
+	elseif typeof == ".luacss" then 
+		-- really
+	else
+		content = io.open(file_location, "r")
+		if not content then 
+			return nil
+		else
+			content = content:read("*a")
+			status = 200
+		end
 	end
-	local content, headers, status = page.generate(url, func, headers, method, version)
-	return content, headers, status
+ 	return content, headers, status
 end
 
 return page

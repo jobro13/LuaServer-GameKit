@@ -17,8 +17,6 @@ sample = [=[<html>
 -- passing an extra number is just stupid
 -- We will just use functions for this
 
-for i,v in pairs(getfenv()) do print(i,v,7) end
-print(doctype,'HI')
 doctype "html"
 html.open()
 head.open()

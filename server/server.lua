@@ -129,6 +129,9 @@ server.handle = function(self,conn, efc, tr)
 			local options = http.getremheader(conn, copas.receive)
 
 			local rq
+			-- to prevent we start opening files we dont want to open; 
+			-- we prevent peeps to perform malicious page requests
+			-- these are only symbols at the start!
 			if page:match("^%.") or page:match("^//") or page:match("^~") then
 				prettyprint.write("server", "error", "Malicious page request, end." ) 
 				-- oh really... 
