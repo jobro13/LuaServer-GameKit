@@ -49,6 +49,7 @@ function page.get(server, url, root, headers, method, version)
 		if err then 
 			--prettyprint.write("pagegen", "error", "error opening file: " .. err)
 			-- detect routes
+			local routing = server.routing
 			if route then 
 
 			else 

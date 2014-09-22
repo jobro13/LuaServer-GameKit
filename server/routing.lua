@@ -15,10 +15,84 @@ end
 -- usagepage is the location of the script
 -- as seen from our home directory (web)
 function routing:add(routename, usagepage)
+	-- first check if this thing is more specific
+	-- we create a tree like that
+	-- .. hrm thats hard.
 
+	-- FIRST: convert routename to a Lua pattern
+	local pattern = routename
+	pattern = pattern:gsub("%*", ".+")
+
+	--> new routename /
+	--> check
+
+	local deep, deeplevel = nil, 0
+	local low, lowlevel = nil, math.huge
+	local function scan(where, level)
+		for rname, rdata in pairs(where) do 
+			-- ex /page matches /.+
+			if rname ~= 1 then 
+				if rname:match(pattern) then
+					if level < lowlevel then 
+						lowlevel = level 
+						low = where 
+					end
+				end
+			-- WOT
+			-- ex /.+
+				if pattern:match(rname) then 
+					if level > deeplevel then
+						deeplevel = level 
+						deep = rdata
+					end 
+				end
+				scan(rdata, level + 1)
+			end
+		end
+	end
+	scan(self.routes, 1)
+	if deep then 
+		if not deep.specific then 
+			deep.specific = {[pattern] = {usagepage}}
+		else
+			deep.specific[pattern] = {usagepage}
+		end
+	end
+	if low then 
+		local my = {[pattern] = {usagepage, specific = {}}}
+		for i,v in pairs(low) do 
+			my[pattern].specific[i] = v
+		end 
+		self.routes = my
+	end 
+	if not low and not deep then 
+		self.routes[pattern] = {usagepage}
+	end
 end
 
-
+function routing:findroute(sign)
+	local deep = nil
+	local dlevel = 0
+	function scan(where, level)
+		for rname, rdata in pairs(where) do 
+			if not (rname == 1) then 
+				print(sign,rname)
+				if sign:match(rname) then 
+					if level > dlevel then 
+						deep = rdata[1] -- usage file
+						dlevel = level
+					end
+					-- if it does match, it can match specific patterns too!
+					if rdata.specific then
+						scan(rdata.specific, level + 1)
+					end
+				end
+			end
+		end
+	end
+	scan(self.routes, 1)
+	return deep
+end 
 
 
 
