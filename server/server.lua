@@ -11,10 +11,6 @@ local http = require "http"
 
 settings = libsetting.GetSettingHandler("settings/settings.txt")
 
-for i,v in pairs(settings) do
-	print(i,v)
-end
-
 --local html = require "html"
 
 -- I heard you didnt like PHP
@@ -68,7 +64,6 @@ end
 
 function server:Start()
 	while true do
-		prettyprint.write("server", "info", "Waiting for a connection ... ")
 		copas.step()
 	end 
 end
@@ -86,6 +81,14 @@ end
 --> like User-Agent
 
 function server:getpage(url, clientheaders, method, version)
+	local content, headers, status = page.get(url, self.webdir, clientheaders, method, version)
+	if headers and not headers["Cache-Control"] then 
+		headers["Cache-Control"] = "no-cache"
+	end
+	return content, headers, status
+--[[
+
+
 	local i,err = io.open(self.webdir .. url, "r")
 	prettyprint.write("server", "info", url .. " open: " .. tostring(i))
 	if not i then 
@@ -110,45 +113,38 @@ function server:getpage(url, clientheaders, method, version)
 	elseif page_context.filetype == "blasf" then 
 	else 
 		return i:read("*all"), {["Cache-Control"] = "no-cache"}
-	end
+	end--]]
 end
 
 server.handle = function(self,conn, efc, tr)
 	self.RQs = self.RQs + 1
 	local id = self.RQs 
-	prettyprint.write("server", "info", "New connection, id: "..self.RQs)
 	local request = copas.receive(conn, "*l")
 	local METHOD, PAGE, VERSION 
 	local cname = "Client " .. id .. " "
 	if request then 
 		local method, page, version = http.getrequest(request)
-		print(page)
 		if method and page and version then 
-			prettyprint.write("server", "info", cname .. method .. " request on page: " .. page .. " (HTTP: "..version..")")
 			--local cl = http.getclen(conn, copas.receive)
 			local options = http.getremheader(conn, copas.receive)
-			local cl = options["Content-Length"]
-			if cl then 
-				prettyprint.write("server", "info", cname.. " Content Length: ".. tostring(cl) )
-			end
+
 			local rq
 			if page:match("^%.") or page:match("^//") or page:match("^~") then
 				prettyprint.write("server", "error", "Malicious page request, end." ) 
 				-- oh really... 
-				rq = http.response(404, nil, self:getpage(self["404"], options, method, version))
-			elseif page == "/" then 
+				rq = http.response(404, nil, self:getpage(self["404"], method, page, version))
+			--[[elseif page == "/" then 
 				prettyprint.write("server", "info", "Redirect to homepage .." ) 
-				rq = http.response(302, {["Location"] = "/index.lua"}, "")
+				rq = http.response(302, {["Location"] = "/index.lua"}, "")--]]
 			else
-				local content, headers = self:getpage(page, options, method, version) 
-				print("content:: ", content)
+				local content, headers,status = self:getpage(page, options, method, version) 
 				local headers = headers or {}
-				local headers = nil
+	
 				if content then 
-					prettyprint.write("server", "info", "Content, sending ... " ) 
-					rq = http.response(200, headers, self:getpage(page, options, method, version) )
+					rq = http.response(status, headers, content, method, page, version)
 				else 
-					rq = http.response(404, nil, self:getpage(self["404"], options, method, version))
+					local content, headers = self:getpage(self["404"], options, method, version) 
+					rq = http.response(404,headers,content, method, page, version)
 				end
 			end
 			if rq then 

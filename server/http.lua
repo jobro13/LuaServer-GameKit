@@ -1,5 +1,7 @@
 -- HTTP module
 
+local prettyprint = require 'prettyprint'
+
 local http = {}
 
 -- returns strings only
@@ -7,27 +9,40 @@ local http = {}
 http.httpversion = "1.1" -- orly
 
 http.statuscodes = {
-	[200] = "OK",
-	[302] = "Found",
-	[404] = "NOT FOUND"
+	[200] = {"OK", 1},
+	[302] = {"Found", 3},
+	[404] = {"NOT FOUND", 2}
 }
 
 -- returns a http response
 -- status: status code
 -- headers: table; indices = header value; values = their values
 -- content = http content field
--- conn: the LuaSocket connection
--- writef: the write function (provided by copas, or use your own)
-function http.response(status,headers,content, conn, writef)
+
+function http.response(status,headers,content, method, page, version)
 	local out = ""
-	out = "HTTP/"..http.httpversion.." "..status.." ".. (http.statuscodes[tonumber(status) or ""] or "WAT") .."\r\n"
+	local status = status or 200
+	out = "HTTP/"..http.httpversion.." "..status.." ".. (http.statuscodes[tonumber(status) or ""][1] or "UKS") .."\r\n"
 	local headers = headers or {}
 	for i,v in pairs(headers) do 
 		out = out .. i .. ": "..v .. "\r\n"
 	end 
-	out = out .. "Content-Type: text/html\r\n"
+	if not headers["Content-Type"] then 
+		out = out .. "Content-Type: text/html\r\n"
+	end
 	out = out .. "Content-Length: ".. (content:len())  .. "\r\n\r\n"
 	out = out .. content 
+
+	local colorcode= (http.statuscodes[tonumber(status) or ""][2] )
+	local wr 
+	if colorcode == 1 then 
+		wr = "%{green}"
+	elseif colorcode == 3 then
+		wr = "%{yellow}"
+	else 
+		wr = "%{red}"
+	end
+	prettyprint.write("http-parse", "info", method .. ": [" .. wr .. status ..  "%{reset}] -> "..page)
 
 	return out
 end

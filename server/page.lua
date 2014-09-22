@@ -19,7 +19,7 @@ end
 -- file = already opened file
 -- method: GET/POST/ etc
 -- version: 1.1 (http version)
-function page.generate(url, file_location, headers, method, version)
+function page.generate(url, func, headers, method, version)
 	html.clearbuffer()
 	local env = {
 		location = url;
@@ -28,10 +28,7 @@ function page.generate(url, file_location, headers, method, version)
 		version = version;
 		content = ""
 	}
-	local func,err = loadfile(file_location)
-	if err then 
-		prettyprint.write("pagegen", "error", "error opening file: " .. err)
-	end
+
 	local meta = getmetatable(html)
 	--local wr = getfenv(func)
 	--wr.newf = html.newf
@@ -40,6 +37,18 @@ function page.generate(url, file_location, headers, method, version)
 	func(url, headers, method, version)
 	--print(html.buffer)
 	return html.buffer
+end
+
+function page.get(url, root, headers, method, version)
+	-- pagegen detector stuff here
+	local file_location = root .. url
+	local func,err = loadfile(file_location)
+	if err then 
+		prettyprint.write("pagegen", "error", "error opening file: " .. err)
+		return nil
+	end
+	local content, headers, status = page.generate(url, func, headers, method, version)
+	return content, headers, status
 end
 
 return page

@@ -59,7 +59,6 @@ function optparse(optlist,Parent,Name)
 	--print(Name)
 	local partbuff = ""
 	for i,v in pairs(optlist) do 
-		print(i,v)
 		if not got[i] then 
 			if not opened then 
 				opened = true 
@@ -73,9 +72,7 @@ function optparse(optlist,Parent,Name)
 			partbuff = partbuff .. i .. "=\""..v.."\""
 		end
 	end
-	print(Name, optlist.open)
 	if partbuff ~= "" or optlist.open then 
-		print("->")
 		partbuff = partbuff .. ">"
 		write(partbuff)
 	end
@@ -86,7 +83,6 @@ function optparse(optlist,Parent,Name)
 	if optlist.close then 
 		write("</"..Name..">")
 	elseif optlist.fclose then 
-		print(Name, Name:len(), "HI")
 		write("</"..Name..">")
 	end
 end
@@ -114,7 +110,6 @@ local fcontext = {
 			
 				optparse(options, upname.Parent, upname.Name)
 			else 
-				print(upname.Name, "CLOSING")
 				optparse({fclose = true}, upname.Parent, upname.Name)
 			end
 		elseif tab.Name == "full" then 
@@ -170,17 +165,14 @@ local newf = html.newf
 
 local content = newf("content", html)
 function content.call(c)
-	print("yes, content", c)
 	write(c)
 end
 
 local doctype = newf("doctype", html)
 function doctype.call(dtype)
-	print("ES")
 	write("<!DOCTYPE " ..dtype ..">")
 end
-print("..")
-print(rawget(html.doctype,"call"), "call")
+
 setmetatable(html, fcontext)
 
 return html
