@@ -37,7 +37,7 @@ end
 function server:new()
 	local o = {}
 	o.routing = routing:new()
-	return setmetatable({}, {__index=self})
+	return setmetatable(o, {__index=self})
 end 
 
 function server:Initialize()

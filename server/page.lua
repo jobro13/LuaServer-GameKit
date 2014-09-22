@@ -39,22 +39,26 @@ function page.generate(url, func, headers, method, version)
 	return html.buffer
 end
 
-function page.get(server, url, root, headers, method, version)
+function page.tryroute(server,url,root,headers,method,version)
+			local routing = server.routing
+			local route = routing:findroute(url)
+			print(route)
+			if route then 
+				return page.get(server, route, root, headers, method, version, true)
+			end
+
+end
+
+function page.get(server, url, root, headers, method, version, blockrecurse)
 	-- pagegen detector stuff here
 	local file_location = root .. url
+	print(file_location)
 	local typeof = file_location:match("(%.%w+)$")
 	local content, headers, status
 	if typeof == ".lua" then 
 		local func,err = loadfile(file_location)
 		if err then 
-			--prettyprint.write("pagegen", "error", "error opening file: " .. err)
-			-- detect routes
-			local routing = server.routing
-			if route then 
 
-			else 
-				return nil
-			end
 		else 
 			content, headers, status = page.generate(url, func, headers, method, version)
 		end
@@ -63,11 +67,15 @@ function page.get(server, url, root, headers, method, version)
 	else
 		content = io.open(file_location, "r")
 		if not content then 
-			return nil
+			-- do nothing
 		else
 			content = content:read("*a")
 			status = 200
 		end
+	end
+	if not content and not blockrecurse then
+		print(server.routing)
+		content,headers,status = page.tryroute(server,url,root,headers,method,version)
 	end
  	return content, headers, status
 end
