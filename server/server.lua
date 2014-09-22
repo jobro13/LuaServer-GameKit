@@ -8,6 +8,7 @@ local lfs = require "lfs"
 local event = require "event"
 local libsetting = require "settings/libsetting"
 local http = require "http"
+local routing = require "routing"
 
 settings = libsetting.GetSettingHandler("settings/settings.txt")
 
@@ -34,6 +35,8 @@ end
 
 
 function server:new()
+	local o = {}
+	o.routing = routing:new()
 	return setmetatable({}, {__index=self})
 end 
 
@@ -81,7 +84,7 @@ end
 --> like User-Agent
 
 function server:getpage(url, clientheaders, method, version)
-	local content, headers, status = page.get(url, self.webdir, clientheaders, method, version)
+	local content, headers, status = page.get(self, url, self.webdir, clientheaders, method, version)
 	if headers and not headers["Cache-Control"] then 
 		headers["Cache-Control"] = "no-cache"
 	end

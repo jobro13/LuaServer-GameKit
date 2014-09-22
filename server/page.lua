@@ -39,7 +39,7 @@ function page.generate(url, func, headers, method, version)
 	return html.buffer
 end
 
-function page.get(url, root, headers, method, version)
+function page.get(server, url, root, headers, method, version)
 	-- pagegen detector stuff here
 	local file_location = root .. url
 	local typeof = file_location:match("(%.%w+)$")
@@ -48,9 +48,15 @@ function page.get(url, root, headers, method, version)
 		local func,err = loadfile(file_location)
 		if err then 
 			--prettyprint.write("pagegen", "error", "error opening file: " .. err)
-			return nil
+			-- detect routes
+			if route then 
+
+			else 
+				return nil
+			end
+		else 
+			content, headers, status = page.generate(url, func, headers, method, version)
 		end
-		content, headers, status = page.generate(url, func, headers, method, version)
 	elseif typeof == ".luacss" then 
 		-- really
 	else
