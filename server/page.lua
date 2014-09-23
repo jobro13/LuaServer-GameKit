@@ -1,8 +1,15 @@
 -- Page Generator module
 
+-- Calls .lua files with:
+-- url (this is the "routed" URL, so this may not be the source)
+-- headers (all headers from the client in a table.)
+
+
+local http = require "http" -- to get empty header table
 local html = require "html"
 local css = require "css"
 local prettyprint = require "prettyprint"
+local utils = require "pageutils"
 
 local page = {}
 
@@ -22,32 +29,52 @@ end
 function page.generate(url, func, headers, method, version, originalurl)
 	html.clearbuffer()
 	local env = {
-		location = url;
+		url = url;
 		headers = headers;
 		method = method;
 		version = version;
 		originalurl = originalurl;
-		content = ""
+		returnheaders = http.getnewheader();
 	}
 
-	local meta = getmetatable(html)
+	local meta = {__index=html}
+	setmetatable(env, meta)
 	--local wr = getfenv(func)
 	--wr.newf = html.newf
 	--setmetatable(wr, meta)
-	setfenv(func,html)
-	local ok, err = pcall(function() func(url, headers, method, version, env) end)
-	print(ok, err)
+	setfenv(func,env)
+
+	-- make headers read only
+
+	local newh = {}
+	for option, values in pairs(headers) do 
+		if #values == 1 then 
+			newh[option] = values[1]
+		else 
+			newh[option] = values
+		end
+	end
+
+
+	local rets = {pcall(function() return func(url, newh, method, version, env) end)}
+	local ok = rets[1]
+	local err = rets[2]
+	local headers, status
 	if not ok and err then 
 		prettyprint.write("pagegen", "error", "error parsing " .. url .. ": " .. err)
+		return ""
+	else 
+		headers = rets[2]
+		status = rets[3]
 	end
+	
 	--print(html.buffer)
-	return html.buffer
+	return html.buffer, headers, status
 end
 
 function page.tryroute(server,url,root,headers,method,version)
 			local routing = server.routing
 			local route, newroot = routing:findroute(url)
-			print(route, "newroute")
 			if route then 
 				return page.get(server, route, newroot or root, headers, method, version, true, url)
 			end
@@ -63,7 +90,7 @@ function page.get(server, url, root, headers, method, version, blockrecurse, ori
 	if typeof == ".lua" then 
 		local func,err = loadfile(file_location)
 		if err then 
-			print(err)
+
 		else 
 			content, headers, status = page.generate(url, func, headers, method, version, originalurl)
 		end

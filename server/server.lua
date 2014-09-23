@@ -83,7 +83,27 @@ end
 --> ClientHeaders are all remaining headers!
 --> like User-Agent
 
+-- bah. we need to use metatables to have more same-key header values.
+local chmeta = {
+	__newindex = function(tab,ind,val)
+		local target = tab.__data
+		if target[ind] then 
+			table.insert(target[ind], val)
+		else 
+			target[ind] = {val}
+		end
+	end,
+	__index = function(tab,ind)
+		return tab.__data[ind]
+	end
+}
+
 function server:getpage(url, clientheaders, method, version)
+	-- god dammit
+--	local newh = {__data = {}}
+--	setmetatable(newh, chmeta)
+
+
 	local content, headers, status = page.get(self, url, self.webdir, clientheaders, method, version)
 	if headers and not headers["Cache-Control"] then 
 		headers["Cache-Control"] = "no-cache"

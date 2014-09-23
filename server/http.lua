@@ -23,9 +23,11 @@ function http.response(status,headers,content, method, page, version, clock)
 	local out = ""
 	local status = status or 200
 	out = "HTTP/"..http.httpversion.." "..status.." ".. (http.statuscodes[tonumber(status) or ""][1] or "UKS") .."\r\n"
-	local headers = headers or {}
+	local headers = (headers and headers.__data) or {}
 	for i,v in pairs(headers) do 
-		out = out .. i .. ": "..v .. "\r\n"
+		for ind, val in pairs(v) do 
+			out = out .. i .. ": "..val .. "\r\n"
+		end
 	end 
 	if not headers["Content-Type"] then 
 		out = out .. "Content-Type: text/html\r\n"
@@ -47,10 +49,31 @@ function http.response(status,headers,content, method, page, version, clock)
 	return out
 end
 
+local chmeta = {
+	__newindex = function(tab,ind,val)
+		local target = tab.__data
+		if target[ind] then 
+			table.insert(target[ind], val)
+		else 
+			target[ind] = {val}
+		end
+	end,
+	__index = function(tab,ind)
+		return tab.__data[ind]
+	end
+}
+
+-- returns an empty header object
+function http.getnewheader()
+		local out = {__data = {}}
+		return setmetatable(out, chmeta)
+end
+
 -- returns all header options into a table
-function http.getremheader(conn, readf)
+function http.getremheader(conn, readf, headertable)
 	local line = " "
-	local out = {}
+	local out = {__data = {}}
+	setmetatable(out, chmeta)
 
 	while line and line ~= "" and line ~= "\r\n" do 
 		line = readf(conn, "*l")

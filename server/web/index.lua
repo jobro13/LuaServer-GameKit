@@ -10,7 +10,7 @@ head.close()
 body.open()
 b.full "Welcome to a sample page"
 p.open()
-b.full ("URL is " .. (args[5].originalurl))
+b.full ("URL is " .. (originalurl))
 p.close()
 p.open()
 b.full ("local time is " .. os.date() )
