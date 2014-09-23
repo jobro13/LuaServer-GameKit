@@ -117,7 +117,8 @@ local fcontext = {
 			options.open = true
 			tab.Parent.close(options)
 		elseif tab.Name == "open" then 
-			optparse({open = true}, tab.Parent.Parent, tab.Parent.Name)
+			options.open=true
+			optparse(options, tab.Parent.Parent, tab.Parent.Name)
 		else
 			optparse(options or {}, tab.Parent, tab.Name)
 		end

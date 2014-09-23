@@ -1,15 +1,15 @@
 c = cookie.extract()
 
 cookie.set("testcookie", 
-	{path = "/",
+	{path = "/",expires =  (os.date("%a, %d-%b-%Y %H:%M:%S GMT", os.time() + 3600))})
 
 
-	expires =  (os.date("%a, %d-%b-%Y %H:%M:%S GMT", os.time() + 3600))})
 
 doctype "html"
 html.open()
 head.open()
 title.full "Sample page"
+link.open {rel = "stylesheet", href = "/main.css"}
 head.close()
 body.open()
 b.full "Welcome to a sample page"
