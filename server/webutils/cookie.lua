@@ -40,7 +40,7 @@ function cookie.set(cookiename, options)
 		headerv  = headerv .. "; " .. add
 	end
 	returnheaders[headern] = headerv
-	print(headern, headerv)
+--	print(headern, headerv)
 end
 
 function cookie.remove(cookiename)

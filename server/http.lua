@@ -24,9 +24,24 @@ function http.response(status,headers,content, method, page, version, clock)
 	local status = status or 200
 	out = "HTTP/"..http.httpversion.." "..status.." ".. (http.statuscodes[tonumber(status) or ""][1] or "UKS") .."\r\n"
 	local headers = (headers and headers.__data) or {}
+
+	local Prio = {"Set-Cookie"}
+	local Prios = {}
+
+	for i,v in pairs(Prio) do 
+		if headers[v] then 
+			for ind, val in pairs(headers[v]) do 
+				out = out .. v .. ": "..val.."\r\n"
+			end
+		end
+		Prios[v] = true
+	end
+
 	for i,v in pairs(headers) do 
-		for ind, val in pairs(v) do 
-			out = out .. i .. ": "..val .. "\r\n"
+		if not Prios[i] then 
+			for ind, val in pairs(v) do 
+				out = out .. i .. ": "..val .. "\r\n"
+			end
 		end
 	end 
 	if not headers["Content-Type"] then 
@@ -73,19 +88,11 @@ end
 function http.getremheader(conn, readf, headertable)
 	local line = " "
 	local out = http.getnewheader()
-	print("HEADERGEN")
 	while line and line ~= "" and line ~= "\r\n" do 
 		line = readf(conn, "*l")
-		print(line)
 		local option, value = line:match("^([^:]+): (.*)")
-		print(" le option and le value")
-		print(option, value)
 		if option and value then 
 			out[option] = value 
-			print("OPTION")
-			print(option)
-			print("VAL")
-			print(value)
 		end 
 	end 
 	return out 

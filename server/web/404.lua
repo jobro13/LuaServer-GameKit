@@ -17,6 +17,8 @@ sample = [=[<html>
 -- passing an extra number is just stupid
 -- We will just use functions for this
 
+
+
 doctype "html"
 html.open()
 head.open()

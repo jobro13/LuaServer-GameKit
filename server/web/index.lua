@@ -1,11 +1,10 @@
 c = cookie.extract()
-for i,v in ipairs(c) do 
-	print("Cookie! Yum. " ..  v)
-end
 
-print "data"
+cookie.set("testcookie", 
+	{path = "/",
 
-cookie.set("testcookie", {expires = (os.date("%c", os.time() + 3600))})
+
+	expires =  (os.date("%a, %d-%b-%Y %H:%M:%S GMT", os.time() + 3600))})
 
 doctype "html"
 html.open()
@@ -18,7 +17,7 @@ p.open()
 b.full ("URL is " .. (originalurl))
 p.close()
 p.open()
-b.full ("local time is " .. os.date() )
+b.full ("local time is " .. os.date("%a, %d-%b-%Y %H:%M:%S GMT") )
 p.close()
 
 -- OMG EPIC

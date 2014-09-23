@@ -110,14 +110,13 @@ function page.generate(url, func, headers, method, version, originalurl)
 		status = env.status
 	end
 	
-	print(html.buffer)
 	return html.buffer, headers, status
 end
 
 function page.tryroute(server,url,root,headers,method,version)
 			local routing = server.routing
 			local route, newroot = routing:findroute(url)
-			print("route ->", route, newroot)
+			
 			if route then 
 				return page.get(server, route, newroot or root, headers, method, version, true, url)
 			end
@@ -150,9 +149,7 @@ function page.get(server, url, root, headers, method, version, blockrecurse, ori
 	if not content and not blockrecurse then
 		content,rheaders,status = page.tryroute(server,url,root,headers,method,version)
 	end
-	for i,v in pairs(rheaders) do 
-		print(i,v)
-	end
+
  	return content, rheaders, status
 end
 
