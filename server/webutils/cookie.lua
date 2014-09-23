@@ -1,6 +1,6 @@
 local cookies = {}
 
-local prettyprint = require "prettyprint"
+--local prettyprint = require "prettyprint"
 
 -- Extract cookies from "headers" table
 --> returns a table with a list of cookies
@@ -17,6 +17,10 @@ function cookies:extract(headers)
 	return cookies
 end
 
+function cookies.testenv()
+	print(headers, "MUST NOT BE NIL BITCHAUEOIRUEOIF")
+end
+
 -- when called with two args;
 -- cookies.set(cookiename, headers)
 -- else include options
@@ -27,7 +31,7 @@ function cookies:set(cookiename, options, headers)
 		if options.__data then 
 			headers = options
 		else 
-			prettyprint.write("cookiegen", "error" "cookiename or headers missing")
+			prettyprint.write("cookiegen", "error", "cookiename or headers missing")
 		end
 	end
 	local headern = "Set-Cookie"
@@ -46,7 +50,7 @@ end
 
 function cookies:remove(cookiename, headers)
 	if not headers then 
-		prettyprint.write("cookiegen", "error" "headers missing")
+		prettyprint.write("cookiegen", "error", "headers missing")
 	end
 	cookies.set(cookiename, {expires = os.date("%c", 0)}, headers)
 end

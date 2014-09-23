@@ -7,7 +7,7 @@ local ret = {}
 local root = "./webutils"
 
 local function add(name, location)
-	o = require(location or (root .. "/"..name))
+	ret[name] = require(location or (root .. "/"..name))
 end 
 
 add("cookie")

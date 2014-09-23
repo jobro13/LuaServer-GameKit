@@ -20,6 +20,32 @@ for index, value in pairs(html) do
 	end 
 end 
 
+local funcproxy = {}
+function funcproxy.call(tab, ...)
+	local tocall = tab.__functroot 
+	local myenv = tab.__env
+	local env = {}
+	setmetatable(env, {__index = function(tab, ind) return rawget(myenv, ind) end})
+	setfenv(tocall, env)
+	return tocall(...)
+end 
+
+
+local utilproxy = {
+	__index = function(tab,ind)
+		local val = rawget(tab, "__root")
+		if val and type(val[ind]) == "function" then 
+			local obj = {}
+			obj.__functroot = val[ind]
+			obj.__env = rawget(tab, "__env")
+			return setmetatable(obj, funcproxy)
+		else 
+			return (val and val[ind])
+		end 
+	end
+}
+
+
 -- DETECT COLLISSIONS ON TABLE!!!!!!!!
 
 -- generate for url; (/index.lua); headers ([User-Agent] = bla)
@@ -37,7 +63,17 @@ function page.generate(url, func, headers, method, version, originalurl)
 		returnheaders = http.getnewheader();
 	}
 
-	local meta = {__index=html}
+	local meta = {
+		__index = function(tab,ind)
+		if utils[ind] then 
+			local proxy = {}
+			proxy.__env = env 
+			proxy.__root = utils[ind]
+			return setmetatable(proxy, utilproxy)
+		end
+			return html[ind]
+	end
+	}
 	setmetatable(env, meta)
 	--local wr = getfenv(func)
 	--wr.newf = html.newf
