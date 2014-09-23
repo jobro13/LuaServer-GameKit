@@ -21,12 +21,14 @@ for index, value in pairs(html) do
 end 
 
 local funcproxy = {}
-function funcproxy.call(tab, ...)
+function funcproxy.__call(tab, ...)
 	local tocall = tab.__functroot 
 	local myenv = tab.__env
 	local env = {}
-	setmetatable(env, {__index = function(tab, ind) return rawget(myenv, ind) end})
+	local glob = getfenv(0)
+	setmetatable(env, {__index = function(tab, ind) return rawget(myenv, ind) or glob[ind] end})
 	setfenv(tocall, env)
+	print("in funcproxy -> calling")
 	return tocall(...)
 end 
 
@@ -38,6 +40,7 @@ local utilproxy = {
 			local obj = {}
 			obj.__functroot = val[ind]
 			obj.__env = rawget(tab, "__env")
+			print("created funcproxy")
 			return setmetatable(obj, funcproxy)
 		else 
 			return (val and val[ind])
@@ -65,13 +68,17 @@ function page.generate(url, func, headers, method, version, originalurl)
 
 	local meta = {
 		__index = function(tab,ind)
+		print("check for utils and ind" .. ind, utils[ind])
 		if utils[ind] then 
 			local proxy = {}
 			proxy.__env = env 
 			proxy.__root = utils[ind]
-			return setmetatable(proxy, utilproxy)
+			print("created utilproxy")
+			local myproxy = setmetatable(proxy, utilproxy)
+			rawset(tab,ind,myproxy)
+			return myproxy
 		end
-			return html[ind]
+		return html[ind]
 	end
 	}
 	setmetatable(env, meta)
@@ -119,16 +126,17 @@ end
 
 function page.get(server, url, root, headers, method, version, blockrecurse, originalurl)
 	-- pagegen detector stuff here
+	print("RECHECK -> ", headers)
 	local file_location = root .. url
 	print(file_location)
 	local typeof = file_location:match("(%.%w+)$")
-	local content, headers, status
+	local content, rheaders, status
 	if typeof == ".lua" then 
 		local func,err = loadfile(file_location)
 		if err then 
 
 		else 
-			content, headers, status = page.generate(url, func, headers, method, version, originalurl)
+			content, rheaders, status = page.generate(url, func, headers, method, version, originalurl)
 		end
 	elseif typeof == ".luacss" then 
 		-- really
@@ -142,10 +150,10 @@ function page.get(server, url, root, headers, method, version, blockrecurse, ori
 		end
 	end
 	if not content and not blockrecurse then
-		print(server.routing)
-		content,headers,status = page.tryroute(server,url,root,headers,method,version)
+		print(server.routing, "ROUTING", headers)
+		content,rheaders,status = page.tryroute(server,url,root,headers,method,version)
 	end
- 	return content, headers, status
+ 	return content, rheaders, status
 end
 
 return page

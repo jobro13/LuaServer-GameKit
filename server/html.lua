@@ -5,11 +5,6 @@
 local html = {}
 
 local prettyprint = require "prettyprint"
-local utils = require "pageutils"
-
-for i,v in pairs(utils) do 
-	html[i] = v 
-end
 
 function err(msg)
 	prettyprint.write("htmlparse", "error", msg)

@@ -103,7 +103,7 @@ function server:getpage(url, clientheaders, method, version)
 --	local newh = {__data = {}}
 --	setmetatable(newh, chmeta)
 
-
+	print(clientheaders, "CLIENTHEADERS")
 	local content, headers, status = page.get(self, url, self.webdir, clientheaders, method, version)
 	if headers and not headers["Cache-Control"] then 
 		headers["Cache-Control"] = "no-cache"
