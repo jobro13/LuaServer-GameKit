@@ -19,7 +19,7 @@ http.statuscodes = {
 -- headers: table; indices = header value; values = their values
 -- content = http content field
 
-function http.response(status,headers,content, method, page, version)
+function http.response(status,headers,content, method, page, version, clock)
 	local out = ""
 	local status = status or 200
 	out = "HTTP/"..http.httpversion.." "..status.." ".. (http.statuscodes[tonumber(status) or ""][1] or "UKS") .."\r\n"
@@ -42,7 +42,7 @@ function http.response(status,headers,content, method, page, version)
 	else 
 		wr = "%{red}"
 	end
-	prettyprint.write("http-parse", "info", method .. ": [" .. wr .. status ..  "%{reset}] -> "..page)
+	prettyprint.write("http-parse", "info", "took " .. (math.floor((os.clock() - clock) * 1000)) .. "ms for ".. method .. ": [" .. wr .. status ..  "%{reset}] -> "..page)
 
 	return out
 end

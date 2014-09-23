@@ -121,6 +121,7 @@ end
 
 server.handle = function(self,conn, efc, tr)
 	self.RQs = self.RQs + 1
+	local clock = os.clock()
 	local id = self.RQs 
 	local request = copas.receive(conn, "*l")
 	local METHOD, PAGE, VERSION 
@@ -138,19 +139,19 @@ server.handle = function(self,conn, efc, tr)
 			if page:match("^%.") or page:match("^//") or page:match("^~") then
 				prettyprint.write("server", "error", "Malicious page request, end." ) 
 				-- oh really... 
-				rq = http.response(404, nil, self:getpage(self["404"], method, page, version))
+				rq = http.response(404, nil, self:getpage(self["404"], method, page, version), method, page, version, clock)
 			--[[elseif page == "/" then 
 				prettyprint.write("server", "info", "Redirect to homepage .." ) 
 				rq = http.response(302, {["Location"] = "/index.lua"}, "")--]]
 			else
-				local content, headers,status = self:getpage(page, options, method, version) 
+				local content, headers,status = self:getpage(page, options, method, version, clock) 
 				local headers = headers or {}
 	
 				if content then 
-					rq = http.response(status, headers, content, method, page, version)
+					rq = http.response(status, headers, content, method, page, version, clock)
 				else 
-					local content, headers = self:getpage(self["404"], options, method, version) 
-					rq = http.response(404,headers,content, method, page, version)
+					local content, headers = self:getpage(self["404"], options, method, version, clock) 
+					rq = http.response(404,headers,content, method, page, version, clock)
 				end
 			end
 			if rq then 
