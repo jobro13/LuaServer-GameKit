@@ -13,8 +13,12 @@ end
 -- add route
 -- routename is the pattern
 -- usagepage is the location of the script
+-- optional: pageroot, to define a new page root.
+-- this is handy for.. online games :) 
+-- you can redirect /home/game/gamename/* to
+-- a new root directory!
 -- as seen from our home directory (web)
-function routing:add(routename, usagepage)
+function routing:add(routename, usagepage, newroot)
 	-- first check if this thing is more specific
 	-- we create a tree like that
 	-- .. hrm thats hard.
@@ -31,7 +35,7 @@ function routing:add(routename, usagepage)
 	local function scan(where, level)
 		for rname, rdata in pairs(where) do 
 			-- ex /page matches /.+
-			if rname ~= 1 then 
+			if not (type(rname) == "number") then 
 				if rname:match(pattern) then
 					if level < lowlevel then 
 						lowlevel = level 
@@ -53,13 +57,13 @@ function routing:add(routename, usagepage)
 	scan(self.routes, 1)
 	if deep then 
 		if not deep.specific then 
-			deep.specific = {[pattern] = {usagepage}}
+			deep.specific = {[pattern] = {usagepage, newroot}}
 		else
-			deep.specific[pattern] = {usagepage}
+			deep.specific[pattern] = {usagepage, newroot}
 		end
 	end
 	if low then 
-		local my = {[pattern] = {usagepage, specific = {}}}
+		local my = {[pattern] = {usagepage, newroot,specific = {}}}
 		for i,v in pairs(low) do 
 			my[pattern].specific[i] = v
 		end 
@@ -72,14 +76,16 @@ end
 
 function routing:findroute(sign)
 	local deep = nil
+	local newroot = nil
 	local dlevel = 0
 	function scan(where, level)
 		for rname, rdata in pairs(where) do 
-			if not (rname == 1) then 
+			if not (type(rname) == "number") then 
 				print(sign,rname)
 				if sign:match(rname) then 
 					if level > dlevel then 
 						deep = rdata[1] -- usage file
+						newroot = rdata[2]
 						dlevel = level
 					end
 					-- if it does match, it can match specific patterns too!
@@ -91,7 +97,7 @@ function routing:findroute(sign)
 		end
 	end
 	scan(self.routes, 1)
-	return deep
+	return deep, newroot
 end 
 
 
