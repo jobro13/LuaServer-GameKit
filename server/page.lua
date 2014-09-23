@@ -28,7 +28,6 @@ function funcproxy.__call(tab, ...)
 	local glob = getfenv(0)
 	setmetatable(env, {__index = function(tab, ind) return rawget(myenv, ind) or glob[ind] end})
 	setfenv(tocall, env)
-	print("in funcproxy -> calling")
 	return tocall(...)
 end 
 
@@ -40,8 +39,9 @@ local utilproxy = {
 			local obj = {}
 			obj.__functroot = val[ind]
 			obj.__env = rawget(tab, "__env")
-			print("created funcproxy")
-			return setmetatable(obj, funcproxy)
+			setmetatable(obj, funcproxy)
+			rawset(tab,ind,obj)
+			return obj
 		else 
 			return (val and val[ind])
 		end 
@@ -64,16 +64,15 @@ function page.generate(url, func, headers, method, version, originalurl)
 		version = version;
 		originalurl = originalurl;
 		returnheaders = http.getnewheader();
+		status = 200;
 	}
 
 	local meta = {
 		__index = function(tab,ind)
-		print("check for utils and ind" .. ind, utils[ind])
 		if utils[ind] then 
 			local proxy = {}
 			proxy.__env = env 
 			proxy.__root = utils[ind]
-			print("created utilproxy")
 			local myproxy = setmetatable(proxy, utilproxy)
 			rawset(tab,ind,myproxy)
 			return myproxy
@@ -107,17 +106,18 @@ function page.generate(url, func, headers, method, version, originalurl)
 		prettyprint.write("pagegen", "error", "error parsing " .. url .. ": " .. err)
 		return ""
 	else 
-		headers = rets[2]
-		status = rets[3]
+		headers = env.returnheaders
+		status = env.status
 	end
 	
-	--print(html.buffer)
+	print(html.buffer)
 	return html.buffer, headers, status
 end
 
 function page.tryroute(server,url,root,headers,method,version)
 			local routing = server.routing
 			local route, newroot = routing:findroute(url)
+			print("route ->", route, newroot)
 			if route then 
 				return page.get(server, route, newroot or root, headers, method, version, true, url)
 			end
@@ -126,15 +126,13 @@ end
 
 function page.get(server, url, root, headers, method, version, blockrecurse, originalurl)
 	-- pagegen detector stuff here
-	print("RECHECK -> ", headers)
 	local file_location = root .. url
-	print(file_location)
 	local typeof = file_location:match("(%.%w+)$")
 	local content, rheaders, status
 	if typeof == ".lua" then 
 		local func,err = loadfile(file_location)
 		if err then 
-
+			prettyprint.write("pagegen", "error", err)
 		else 
 			content, rheaders, status = page.generate(url, func, headers, method, version, originalurl)
 		end
@@ -150,8 +148,10 @@ function page.get(server, url, root, headers, method, version, blockrecurse, ori
 		end
 	end
 	if not content and not blockrecurse then
-		print(server.routing, "ROUTING", headers)
 		content,rheaders,status = page.tryroute(server,url,root,headers,method,version)
+	end
+	for i,v in pairs(rheaders) do 
+		print(i,v)
 	end
  	return content, rheaders, status
 end

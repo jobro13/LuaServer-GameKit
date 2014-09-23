@@ -72,14 +72,20 @@ end
 -- returns all header options into a table
 function http.getremheader(conn, readf, headertable)
 	local line = " "
-	local out = {__data = {}}
-	setmetatable(out, chmeta)
-
+	local out = http.getnewheader()
+	print("HEADERGEN")
 	while line and line ~= "" and line ~= "\r\n" do 
 		line = readf(conn, "*l")
-		local option, value = line:match("([^:]*) (.*)")
+		print(line)
+		local option, value = line:match("^([^:]+): (.*)")
+		print(" le option and le value")
+		print(option, value)
 		if option and value then 
 			out[option] = value 
+			print("OPTION")
+			print(option)
+			print("VAL")
+			print(value)
 		end 
 	end 
 	return out 

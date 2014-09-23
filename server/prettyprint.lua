@@ -23,12 +23,12 @@ plib.data = {
 	},
 	error = {
 		from = {
-			addbe = "%{underline red}[",
-			addaf = "%{underline red} - "
+			addbe = "%{bright red}[%{reset}",
+			addaf = "%{bright red} - %{reset}%{blink}"
 		},
 		typemsg = {
 			addbe = "",
-			addaf = "%{underline red}]%{reset}"
+			addaf = "%{reset}%{red}]%{reset}"
 		},
 		msgend = "%{reset}\n",
 		msgstart = "%{bright red}"

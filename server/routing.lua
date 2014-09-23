@@ -81,7 +81,6 @@ function routing:findroute(sign)
 	function scan(where, level)
 		for rname, rdata in pairs(where) do 
 			if not (type(rname) == "number") then 
-				print(sign,rname)
 				if sign:match(rname) then 
 					if level > dlevel then 
 						deep = rdata[1] -- usage file

@@ -2,7 +2,9 @@ local ret = {}
 
 -- pageutils are basically plugins!
 -- plugins should be written as objects with method;
--- via self you can get into the environment of the page!
+-- the page environment is loaded into the function environment
+-- (via ... haxy ways)
+
 
 local root = "./webutils"
 

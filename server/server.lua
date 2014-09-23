@@ -41,7 +41,6 @@ function server:new()
 end 
 
 function server:Initialize()
-
 	self.socket = socket.tcp()
 	prettyprint.write("server", "info", "Starting server on " .. self.IP .. ":" .. self.Port)
 	local ok, err = self.socket:bind(self.IP, self.Port)
@@ -102,8 +101,6 @@ function server:getpage(url, clientheaders, method, version)
 	-- god dammit
 --	local newh = {__data = {}}
 --	setmetatable(newh, chmeta)
-
-	print(clientheaders, "CLIENTHEADERS")
 	local content, headers, status = page.get(self, url, self.webdir, clientheaders, method, version)
 	if headers and not headers["Cache-Control"] then 
 		headers["Cache-Control"] = "no-cache"
