@@ -19,13 +19,14 @@ end
 -- file = already opened file
 -- method: GET/POST/ etc
 -- version: 1.1 (http version)
-function page.generate(url, func, headers, method, version)
+function page.generate(url, func, headers, method, version, originalurl)
 	html.clearbuffer()
 	local env = {
 		location = url;
 		headers = headers;
 		method = method;
 		version = version;
+		originalurl = originalurl;
 		content = ""
 	}
 
@@ -34,7 +35,11 @@ function page.generate(url, func, headers, method, version)
 	--wr.newf = html.newf
 	--setmetatable(wr, meta)
 	setfenv(func,html)
-	func(url, headers, method, version)
+	local ok, err = pcall(function() func(url, headers, method, version, env) end)
+	print(ok, err)
+	if not ok and err then 
+		prettyprint.write("pagegen", "error", "error parsing " .. url .. ": " .. err)
+	end
 	--print(html.buffer)
 	return html.buffer
 end
@@ -44,12 +49,12 @@ function page.tryroute(server,url,root,headers,method,version)
 			local route = routing:findroute(url)
 			print(route)
 			if route then 
-				return page.get(server, route, root, headers, method, version, true)
+				return page.get(server, route, root, headers, method, version, true, url)
 			end
 
 end
 
-function page.get(server, url, root, headers, method, version, blockrecurse)
+function page.get(server, url, root, headers, method, version, blockrecurse, originalurl)
 	-- pagegen detector stuff here
 	local file_location = root .. url
 	print(file_location)
@@ -58,9 +63,9 @@ function page.get(server, url, root, headers, method, version, blockrecurse)
 	if typeof == ".lua" then 
 		local func,err = loadfile(file_location)
 		if err then 
-
+			print(err)
 		else 
-			content, headers, status = page.generate(url, func, headers, method, version)
+			content, headers, status = page.generate(url, func, headers, method, version, originalurl)
 		end
 	elseif typeof == ".luacss" then 
 		-- really
