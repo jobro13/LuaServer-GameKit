@@ -47,7 +47,7 @@ end
 function page.tryroute(server,url,root,headers,method,version)
 			local routing = server.routing
 			local route, newroot = routing:findroute(url)
-			print(route)
+			print(route, "newroute")
 			if route then 
 				return page.get(server, route, newroot or root, headers, method, version, true, url)
 			end

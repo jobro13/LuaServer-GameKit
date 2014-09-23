@@ -25,7 +25,7 @@ function routing:add(routename, usagepage, newroot)
 
 	-- FIRST: convert routename to a Lua pattern
 	local pattern = routename
-	pattern = pattern:gsub("%*", ".+")
+	pattern = pattern:gsub("[^%.]%*", ".*")
 
 	--> new routename /
 	--> check
