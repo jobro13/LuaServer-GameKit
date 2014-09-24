@@ -27,6 +27,13 @@ server.webdir = settings:get "webdir"
 server.home = settings:get "page_home"
 server["404"] = settings:get "page_404"
 
+
+server.ctypes = {
+	[".css"] = "text/css";
+	[".lua"] = "text/html";
+	[".html"] = "text/html";
+}
+
 -- a small function which returns a styled color info message
 -- like [OK], [404]
 local function getcstr(msg, color)
@@ -101,11 +108,11 @@ function server:getpage(url, clientheaders, method, version)
 	-- god dammit
 --	local newh = {__data = {}}
 --	setmetatable(newh, chmeta)
-	local content, headers, status = page.get(self, url, self.webdir, clientheaders, method, version)
+	local content, headers, status, filetype = page.get(self, url, self.webdir, clientheaders, method, version)
 	if headers and not headers["Cache-Control"] then 
 		headers["Cache-Control"] = "no-cache"
 	end
-	return content, headers, status
+	return content, headers, status, filetype
 --[[
 
 
@@ -161,8 +168,13 @@ server.handle = function(self,conn, efc, tr)
 				prettyprint.write("server", "info", "Redirect to homepage .." ) 
 				rq = http.response(302, {["Location"] = "/index.lua"}, "")--]]
 			else
-				local content, headers,status = self:getpage(page, options, method, version, clock) 
-				local headers = headers or {}
+				local content, headers,status, filetype = self:getpage(page, options, method, version, clock)
+				print(headers)
+				local headers = headers or http.getnewheader()
+				print(headers, headers["Content-Type"], self.ctypes[filetype], filetype)
+				if headers and  not headers["Content-Type"] and self.ctypes[filetype] then
+					headers["Content-Type"] = self.ctypes[filetype] 
+				end 
 	
 				if content then 
 					rq = http.response(status, headers, content, method, page, version, clock)

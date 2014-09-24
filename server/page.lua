@@ -128,6 +128,7 @@ function page.get(server, url, root, headers, method, version, blockrecurse, ori
 	local file_location = root .. url
 	local typeof = file_location:match("(%.%w+)$")
 	local content, rheaders, status
+	
 	if typeof == ".lua" then 
 		local func,err = loadfile(file_location)
 		if err then 
@@ -150,7 +151,7 @@ function page.get(server, url, root, headers, method, version, blockrecurse, ori
 		content,rheaders,status = page.tryroute(server,url,root,headers,method,version)
 	end
 
- 	return content, rheaders, status
+ 	return content, rheaders, status, typeof
 end
 
 return page
