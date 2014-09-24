@@ -95,6 +95,7 @@ local fcontext = {
 		if type(options) == "string" then
 			options = {content = options}
 		end
+
 	
 		if rawget(tab, "call") then 
 			tab.call(...)
@@ -116,7 +117,8 @@ local fcontext = {
 			local options = options or {}
 			options.open = true
 			tab.Parent.close(options)
-		elseif tab.Name == "open" then 
+		elseif tab.Name == "open" then
+			local options = options or {} 
 			options.open=true
 			optparse(options, tab.Parent.Parent, tab.Parent.Name)
 		else

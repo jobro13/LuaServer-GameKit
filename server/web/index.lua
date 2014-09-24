@@ -9,9 +9,19 @@ doctype "html"
 html.open()
 head.open()
 title.full "Sample page"
-link.open {rel = "stylesheet", href = "/main.css"}
+link.open {rel = "stylesheet", href = "/main.css", type = "text/css"}
 head.close()
 body.open()
+header.open()
+div.open()
+h1.full("Page Title")
+div.close()
+header.close()
+nav.open()
+
+nav.close()
+
+section.open()
 b.full "Welcome to a sample page"
 p.open()
 b.full ("URL is " .. (originalurl))
@@ -27,6 +37,12 @@ for i,v in ipairs(c) do
 	content("Yummeh cookies: " .. v)
 	p.close()
 end
+
+section.close()
+
+footer.open()
+
+footer.close()
 
 
 body.close()
