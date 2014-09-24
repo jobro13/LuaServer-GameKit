@@ -10,27 +10,44 @@ cookie.set("testcookie",
 doctype "html"
 html.open()
 head.open()
-title.full "Sample page"
+title.full "Full Moon"
 link.open {rel = "stylesheet", href = "/main.css", type = "text/css"}
+
+link.open {rel = "stylesheet", href='http://fonts.googleapis.com/css?family=Lato:100,400', type = 'text/css'}
+
 head.close()
 body.open()
 header.open()
-div.open()
-h1.full("Page Title")
+div.open({class="logo"})
+--div.open()
+div.open({class = "pagetitlebox"})
+h1.full {content = "Full Moon", class = "pagetitle"} 
+h2.full {content = "The most deadly game on the net", class = "pageundertitle"}
 div.close()
-header.close()
-nav.open()
 
+nav.open()
+a.full {href = "/index.lua", content = "Home", class = "nvlink"}
+a.full {href = "/index.lua", content = "Profile", class = "nvlink"}
+a.full {href = "/index.lua", content = "News", class = "nvlink"}
+a.full {href = "/index.lua", content = "Town", class = "nvlink"}
+a.full {href = "/index.lua", content = "Chat", class = "nvlink"}
 nav.close()
 
-section.open()
-b.full "Welcome to a sample page"
-p.open()
-b.full ("URL is " .. (originalurl))
+div.open {class = "ghnoticebox"}
+p.open {content = "by Jochem Brouwer", class = "ghnotice"}
+br.open()
+a.full {href = "https://github.com/jobro13/LuaServer-GameKit", content = "Fork me on GitHub!" }
 p.close()
-p.open()
-b.full ("local time is " .. os.date("%a, %d-%b-%Y %H:%M:%S GMT") )
-p.close()
+div.close()
+
+--div.close()
+div.close()
+div.full{class="clearboth"}
+
+
+header.close()
+--[[section.open()
+b.full "Welcome to full moon"
 
 -- OMG EPIC
 
@@ -44,7 +61,7 @@ section.close()
 
 footer.open()
 
-footer.close()
+footer.close()--]]
 
 
 body.close()
