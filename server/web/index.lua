@@ -1,5 +1,7 @@
 c = cookie.extract()
 
+print(originalurl, "URL")
+
 cookie.set("testcookie", 
 	{path = "/",expires =  (os.date("%a, %d-%b-%Y %H:%M:%S GMT", os.time() + 3600))})
 

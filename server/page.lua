@@ -25,7 +25,7 @@ function funcproxy.__call(tab, ...)
 	local tocall = tab.__functroot 
 	local myenv = tab.__env
 	local env = {}
-	local glob = getfenv(0)
+	local glob = getfenv()
 	setmetatable(env, {__index = function(tab, ind) return rawget(myenv, ind) or glob[ind] end})
 	setfenv(tocall, env)
 	return tocall(...)
@@ -62,7 +62,7 @@ function page.generate(url, func, headers, method, version, originalurl)
 		headers = headers;
 		method = method;
 		version = version;
-		originalurl = originalurl;
+		originalurl = originalurl or url;
 		returnheaders = http.getnewheader();
 		status = 200;
 	}
@@ -128,7 +128,7 @@ function page.get(server, url, root, headers, method, version, blockrecurse, ori
 	local file_location = root .. url
 	local typeof = file_location:match("(%.%w+)$")
 	local content, rheaders, status
-	
+
 	if typeof == ".lua" then 
 		local func,err = loadfile(file_location)
 		if err then 
