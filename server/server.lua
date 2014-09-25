@@ -143,23 +143,11 @@ function server:getpage(url, clientheaders, method, version)
 	end--]]
 end
 
-server.handle = function(self,conn, efc, tr)
-	self.RQs = self.RQs + 1
-	local clock = os.clock()
-	local id = self.RQs 
-	local request = copas.receive(conn, "*l")
-	local METHOD, PAGE, VERSION 
-	local cname = "Client " .. id .. " "
-	if request then 
-		local method, page, version = http.getrequest(request)
-		if method and page and version then 
-			--local cl = http.getclen(conn, copas.receive)
-			local options = http.getremheader(conn, copas.receive)
-
-			local rq
+function server:handlerequest(page, method, version, clock, options)
 			-- to prevent we start opening files we dont want to open; 
 			-- we prevent peeps to perform malicious page requests
 			-- these are only symbols at the start!
+			local rq
 			if page:match("^%.") or page:match("^//") or page:match("^~") then
 				prettyprint.write("server", "error", "Malicious page request, end." ) 
 				-- oh really... 
@@ -182,7 +170,25 @@ server.handle = function(self,conn, efc, tr)
 					local content, headers = self:getpage(self["404"], options, method, version, clock) 
 					rq = http.response(404,headers,content, method, page, version, clock)
 				end
-			end
+			end	
+			return rq
+end
+
+server.handle = function(self,conn, efc, tr)
+	self.RQs = self.RQs + 1
+	local clock = os.clock()
+	local id = self.RQs 
+	local request = copas.receive(conn, "*l")
+	local METHOD, PAGE, VERSION 
+	local cname = "Client " .. id .. " "
+	if request then 
+		local method, page, version = http.getrequest(request)
+		if method and page and version then 
+			--local cl = http.getclen(conn, copas.receive)
+			local options = http.getremheader(conn, copas.receive)
+
+			local rq = self:handlerequest(page,method,version,clock, options)
+
 			if rq then 
 
 				copas.send(conn, rq)
