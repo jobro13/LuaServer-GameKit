@@ -12,6 +12,11 @@ a {
 	border-bottom: 3px solid #88A3A3;
 }
 
+a:hover{
+	border-bottom: 3px solid #A8C5C5;
+	color: #B8DDDD;
+}
+
 header {
 	height: 90px;
 }

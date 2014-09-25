@@ -117,8 +117,8 @@ function page.tryroute(server,url,root,headers,method,version)
 			local routing = server.routing
 			local route, newroot = routing:findroute(url)
 			
-			if route then 
-				return page.get(server, route, newroot or root, headers, method, version, true, url)
+			if route or newroot then 
+				return page.get(server, route or url, newroot or root, headers, method, version, true, url)
 			end
 
 end
@@ -148,7 +148,7 @@ function page.get(server, url, root, headers, method, version, blockrecurse, ori
 		end
 	end
 	if not content and not blockrecurse then
-		content,rheaders,status = page.tryroute(server,url,root,headers,method,version)
+		content,rheaders,status, typeof = page.tryroute(server,url,root,headers,method,version)
 	end
 
  	return content, rheaders, status, typeof

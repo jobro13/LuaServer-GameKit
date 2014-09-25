@@ -18,6 +18,8 @@ end
 -- you can redirect /home/game/gamename/* to
 -- a new root directory!
 -- as seen from our home directory (web)
+-- if usagepage is not define,d but newroot;
+-- behaviour is that file is being looked up in newroot
 function routing:add(routename, usagepage, newroot)
 	-- first check if this thing is more specific
 	-- we create a tree like that
@@ -70,7 +72,7 @@ function routing:add(routename, usagepage, newroot)
 		self.routes = my
 	end 
 	if not low and not deep then 
-		self.routes[pattern] = {usagepage}
+		self.routes[pattern] = {usagepage, newroot}
 	end
 end
 
@@ -96,6 +98,7 @@ function routing:findroute(sign)
 		end
 	end
 	scan(self.routes, 1)
+	print("new root for " .. sign .. " is: ", deep, newroot)
 	return deep, newroot
 end 
 
