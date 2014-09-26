@@ -12,8 +12,12 @@ end
 
 html.buffer = "" -- string to write to.
 
-function html.clearbuffer()
-	html.buffer = ""
+function html:new()
+	return setmetatable({buffer = ""}, {__index=self})
+end
+
+function html:clearbuffer()
+	self.buffer = ""
 end
 
 -- not implemented
@@ -28,8 +32,8 @@ html.tagdata = {
 
 }
 
-function write(str)
-	html.buffer = html.buffer .. str 
+function html:write(str)
+	self.buffer = self.buffer .. str 
 end 
 
 -- optlist; list of things to do
@@ -38,7 +42,7 @@ end
 -- it is possible to traverse parent objects too yay
 --  Name is the object name
 
-function optparse(optlist,Parent,Name)
+function html:optparse(optlist,Parent,Name)
 	-- this has to be done in order.
 	-- so we cant use pairs 
 
@@ -46,7 +50,7 @@ function optparse(optlist,Parent,Name)
 	local opened = false
 	local wrotespace = false
 	if optlist.open then -- also include an open tag
-		write("<"..Name)
+		self:write("<"..Name)
 		opened = true 
 	end
 	local got = {
@@ -62,11 +66,11 @@ function optparse(optlist,Parent,Name)
 		if not got[i] then 
 			if not opened then 
 				opened = true 
-				write("<"..Name.." ")
+				self:write("<"..Name.." ")
 				wrotespace = true
 			end
 			if not wrotespace then 
-				write(" ")
+				self:write(" ")
 				wrotespace = true
 			end
 			partbuff = partbuff .. i .. "=\""..v.."\""
@@ -74,16 +78,16 @@ function optparse(optlist,Parent,Name)
 	end
 	if partbuff ~= "" or optlist.open then 
 		partbuff = partbuff .. ">"
-		write(partbuff)
+		self:write(partbuff)
 	end
 	if optlist.content then 
-		write(optlist.content)
+		self:write(optlist.content)
 	end
 
 	if optlist.close then 
-		write("</"..Name..">")
+		self:write("</"..Name..">")
 	elseif optlist.fclose then 
-		write("</"..Name..">")
+		self:write("</"..Name..">")
 	end
 end
 
@@ -91,6 +95,9 @@ local fcontext = {
 	__call = function(tab,...)
 	--	print("call " .. tab.Name, rawget(tab, "call"))
 		local args = {...}
+		local o = tab.objectroot
+		print("This table should be non nil", o)
+		print(tab.Name, tab.Parent.Name)
 		local options = args[1]
 		if type(options) == "string" then
 			options = {content = options}
@@ -98,7 +105,7 @@ local fcontext = {
 
 	
 		if rawget(tab, "call") then 
-			tab.call(...)
+			tab.call(o,...)
 			return 
 		end
 		--local write = rawget(getfenv(), "write")
@@ -109,9 +116,9 @@ local fcontext = {
 				-- force close.
 				options.fclose = true
 			
-				optparse(options, upname.Parent, upname.Name)
+				o:optparse(options, upname.Parent, upname.Name)
 			else 
-				optparse({fclose = true}, upname.Parent, upname.Name)
+				o:optparse({fclose = true}, upname.Parent, upname.Name)
 			end
 		elseif tab.Name == "full" then 
 			local options = options or {}
@@ -120,20 +127,20 @@ local fcontext = {
 		elseif tab.Name == "open" then
 			local options = options or {} 
 			options.open=true
-			optparse(options, tab.Parent.Parent, tab.Parent.Name)
+			o:optparse(options, tab.Parent.Parent, tab.Parent.Name)
 		else
-			optparse(options or {}, tab.Parent, tab.Name)
+			o:optparse(options or {}, tab.Parent, tab.Name)
 		end
 	end,
 	__index = function(tab, val)
 		local origval = rawget(getfenv(), val) 
 	--	print(origval)
-		if tab == getfenv() or tab == html and origval then 
+		if tab == getfenv() or tab == rawget(tab, "objectroot")and origval then 
 			return origval
 		end
 	--	print("I want a new index name " .. val )
 		--local newf = rawget(getfenv(), "newf")
-		return html.newf(val, tab)
+		return rawget(tab, "objectroot"):newf(val, tab)
 	end,
 	__newindex = function(tab,ind,val)
 		rawset(tab,ind,val)
@@ -146,7 +153,8 @@ local fcontext = {
 	end
 end--]]
 
-function html.newf(name, location, options)
+function html:newf(name, location, options)
+	print("Creating new O: " .. name)
 	if not name then 
 		err("Name not provided")
 		return 
@@ -154,6 +162,7 @@ function html.newf(name, location, options)
 	local o = {}
 	o.Name = name
 	o.Parent = location
+	o.objectroot = self
 	if options and type(options) == "table" then 
 		for i,v in pairs(options) do 
 			o[i] = v
@@ -164,18 +173,20 @@ function html.newf(name, location, options)
 	return o
 end
 
-local newf = html.newf
 
-local content = newf("content", html)
-function content.call(c)
-	write(c)
+
+local content = html:newf("content", html)
+function content:call(c)
+	self.objectroot:write(c)
 end
 
-local doctype = newf("doctype", html)
-function doctype.call(dtype)
-	write("<!DOCTYPE " ..dtype ..">")
+local doctype = html:newf("doctype", html)
+function doctype:call(dtype)
+	self.objectroot:write("<!DOCTYPE " ..dtype ..">")
 end
 
+html.objectroot=html
 setmetatable(html, fcontext)
+
 
 return html

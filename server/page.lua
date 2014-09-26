@@ -56,7 +56,11 @@ local utilproxy = {
 -- method: GET/POST/ etc
 -- version: 1.1 (http version)
 function page.generate(url, func, headers, method, version, originalurl)
-	html.clearbuffer()
+	local html = html:new()
+	print(html.buffer == "")
+	html:write("hello")
+	print(html.buffer)
+	local pointer = html
 	local env = {
 		url = url;
 		headers = headers;
@@ -65,7 +69,36 @@ function page.generate(url, func, headers, method, version, originalurl)
 		originalurl = originalurl or url;
 		returnheaders = http.getnewheader();
 		status = 200;
-	}
+
+	}	
+
+	local thisenv = getfenv()
+
+	local funcwrapmeta = {__index=function(tab,ind) print(ind) return env[ind] or thisenv[ind] end}
+
+	env.require = function(name)
+		local data = {require(name)}
+
+		if type(data[1]) == "function" then 
+			setfenv(data[1], setmetatable({}, funcwrapmeta))
+		elseif type(data[1]) == "table" then 
+			-- make a proxy to track our indices.
+			local prx = {}
+			local prxmeta = {__index = function(tab, ind) 
+				if data[1][ind] then 
+					if type(data[1][ind]) == "function" then 
+						print("YES IT IS A FUNCTION")
+						setfenv(data[1][ind],setmetatable({}, funcwrapmeta))
+						return data[1][ind]
+					else 
+						return data[1][ind]
+					end
+				end
+			end}
+			return	setmetatable(prx,prxmeta)
+		end
+		return data[1]
+	end
 
 	local meta = {
 		__index = function(tab,ind)
@@ -98,7 +131,7 @@ function page.generate(url, func, headers, method, version, originalurl)
 	end
 
 
-	local rets = {pcall(function() return func(url, newh, method, version, env) end)}
+	local rets = {xpcall(function() return func(url, newh, method, version, env) end, debug.traceback )}
 	local ok = rets[1]
 	local err = rets[2]
 	local headers, status
@@ -109,7 +142,7 @@ function page.generate(url, func, headers, method, version, originalurl)
 		headers = env.returnheaders
 		status = env.status
 	end
-	
+	print(pointer.buffer)
 	return html.buffer, headers, status
 end
 
