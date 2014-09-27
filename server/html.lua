@@ -13,7 +13,8 @@ end
 html.buffer = "" -- string to write to.
 
 function html:new()
-	return setmetatable({buffer = ""}, {__index=self})
+	local o = {}
+	return setmetatable(o, {__index=self})
 end
 
 function html:clearbuffer()

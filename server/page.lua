@@ -58,9 +58,8 @@ local utilproxy = {
 function page.generate(url, func, headers, method, version, originalurl)
 	local html = html:new()
 	print(html.buffer == "")
-	html:write("hello")
 	print(html.buffer)
-	local pointer = html
+	html.objectroot = html
 	local env = {
 		url = url;
 		headers = headers;
@@ -142,7 +141,6 @@ function page.generate(url, func, headers, method, version, originalurl)
 		headers = env.returnheaders
 		status = env.status
 	end
-	print(pointer.buffer)
 	return html.buffer, headers, status
 end
 
