@@ -56,10 +56,10 @@ local utilproxy = {
 -- method: GET/POST/ etc
 -- version: 1.1 (http version)
 function page.generate(url, func, headers, method, version, originalurl)
-	local html = html:new()
-	print(html.buffer == "")
-	print(html.buffer)
-	html.objectroot = html
+	local newbuf = html:new()
+	--newbuf.objectroot = newbuf
+	newbuf.buffer = ""
+	newbuf.buffloc = newbuf
 	local env = {
 		url = url;
 		headers = headers;
@@ -73,7 +73,22 @@ function page.generate(url, func, headers, method, version, originalurl)
 
 	local thisenv = getfenv()
 
-	local funcwrapmeta = {__index=function(tab,ind) print(ind) return env[ind] or thisenv[ind] end}
+	local meta = {
+		__index = function(tab,ind)
+		if utils[ind] then 
+			local proxy = {}
+			proxy.__env = env 
+			proxy.__root = utils[ind]
+			local myproxy = setmetatable(proxy, utilproxy)
+			rawset(tab,ind,myproxy)
+			return myproxy
+		end
+		return newbuf[ind]
+	end
+	}
+	setmetatable(env, meta)
+
+	local funcwrapmeta = {__index=function(tab,ind) print("find "..ind, newbuf.buffer, env[ind], thisenv[ind]) return env[ind] or thisenv[ind] end}
 
 	env.require = function(name)
 		local data = {require(name)}
@@ -86,7 +101,6 @@ function page.generate(url, func, headers, method, version, originalurl)
 			local prxmeta = {__index = function(tab, ind) 
 				if data[1][ind] then 
 					if type(data[1][ind]) == "function" then 
-						print("YES IT IS A FUNCTION")
 						setfenv(data[1][ind],setmetatable({}, funcwrapmeta))
 						return data[1][ind]
 					else 
@@ -99,20 +113,6 @@ function page.generate(url, func, headers, method, version, originalurl)
 		return data[1]
 	end
 
-	local meta = {
-		__index = function(tab,ind)
-		if utils[ind] then 
-			local proxy = {}
-			proxy.__env = env 
-			proxy.__root = utils[ind]
-			local myproxy = setmetatable(proxy, utilproxy)
-			rawset(tab,ind,myproxy)
-			return myproxy
-		end
-		return html[ind]
-	end
-	}
-	setmetatable(env, meta)
 	--local wr = getfenv(func)
 	--wr.newf = html.newf
 	--setmetatable(wr, meta)
@@ -141,7 +141,7 @@ function page.generate(url, func, headers, method, version, originalurl)
 		headers = env.returnheaders
 		status = env.status
 	end
-	return html.buffer, headers, status
+	return newbuf.buffer, headers, status
 end
 
 function page.tryroute(server,url,root,headers,method,version)

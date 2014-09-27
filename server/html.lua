@@ -12,10 +12,6 @@ end
 
 html.buffer = "" -- string to write to.
 
-function html:new()
-	local o = {}
-	return setmetatable(o, {__index=self})
-end
 
 function html:clearbuffer()
 	self.buffer = ""
@@ -43,7 +39,7 @@ end
 -- it is possible to traverse parent objects too yay
 --  Name is the object name
 
-function html:optparse(optlist,Parent,Name)
+function html:optparse(optlist,Parent,Name, bufo)
 	-- this has to be done in order.
 	-- so we cant use pairs 
 
@@ -97,9 +93,8 @@ local fcontext = {
 	--	print("call " .. tab.Name, rawget(tab, "call"))
 		local args = {...}
 		local o = tab.objectroot
-		print("This table should be non nil", o)
-		print(tab.Name, tab.Parent.Name)
 		local options = args[1]
+		print "call"
 		if type(options) == "string" then
 			options = {content = options}
 		end
@@ -136,12 +131,22 @@ local fcontext = {
 	__index = function(tab, val)
 		local origval = rawget(getfenv(), val) 
 	--	print(origval)
-		if tab == getfenv() or tab == rawget(tab, "objectroot")and origval then 
+		print("hi", val)
+		if tab == getfenv() or tab == rawget(tab, "objectroot") and origval then 
+			print("ret original")
 			return origval
 		end
+		--if rawget(tab, "__isroot") then 
+			if rawget(html, val) then 
+				return html[val]
+			end
+	
 	--	print("I want a new index name " .. val )
 		--local newf = rawget(getfenv(), "newf")
-		return rawget(tab, "objectroot"):newf(val, tab)
+		print(val)
+
+		return html.newf(tab,val,tab)
+	
 	end,
 	__newindex = function(tab,ind,val)
 		rawset(tab,ind,val)
@@ -187,6 +192,16 @@ function doctype:call(dtype)
 end
 
 html.objectroot=html
+
+function html:new()
+	local o = {buffer = ""}
+	o.objectroot = o
+	o.__isroot = true
+	return setmetatable(o, 
+		fcontext
+	)
+end
+
 setmetatable(html, fcontext)
 
 
