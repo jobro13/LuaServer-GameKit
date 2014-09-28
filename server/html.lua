@@ -197,6 +197,7 @@ function doctype:call(dtype)
 end
 
 html.objectroot=html
+html.__bufferlocation = html
 
 function html:new()
 	local o = {buffer = ""}
