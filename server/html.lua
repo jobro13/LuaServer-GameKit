@@ -30,7 +30,11 @@ html.tagdata = {
 }
 
 function html:write(str)
-	self.buffer = self.buffer .. str 
+	print("the write", self)
+	debug.traceback()
+	print(debug.traceback())
+	local root = self.__bufferlocation
+	root.buffer = root.buffer .. str 
 end 
 
 -- optlist; list of things to do
@@ -94,7 +98,7 @@ local fcontext = {
 		local args = {...}
 		local o = tab.objectroot
 		local options = args[1]
-		print "call"
+		--print "call"
 		if type(options) == "string" then
 			options = {content = options}
 		end
@@ -131,7 +135,7 @@ local fcontext = {
 	__index = function(tab, val)
 		local origval = rawget(getfenv(), val) 
 	--	print(origval)
-		print("hi", val)
+
 		if tab == getfenv() or tab == rawget(tab, "objectroot") and origval then 
 			print("ret original")
 			return origval
@@ -143,7 +147,7 @@ local fcontext = {
 	
 	--	print("I want a new index name " .. val )
 		--local newf = rawget(getfenv(), "newf")
-		print(val)
+
 
 		return html.newf(tab,val,tab)
 	
@@ -160,7 +164,7 @@ local fcontext = {
 end--]]
 
 function html:newf(name, location, options)
-	print("Creating new O: " .. name)
+	--print("Creating new O: " .. name)
 	if not name then 
 		err("Name not provided")
 		return 
@@ -169,6 +173,7 @@ function html:newf(name, location, options)
 	o.Name = name
 	o.Parent = location
 	o.objectroot = self
+	o.__bufferlocation = self.__bufferlocation
 	if options and type(options) == "table" then 
 		for i,v in pairs(options) do 
 			o[i] = v
@@ -197,6 +202,8 @@ function html:new()
 	local o = {buffer = ""}
 	o.objectroot = o
 	o.__isroot = true
+	o.__bufferlocation = o
+	print("USING OBJECT:" , o)
 	return setmetatable(o, 
 		fcontext
 	)

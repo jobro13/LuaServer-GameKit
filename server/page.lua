@@ -75,6 +75,7 @@ function page.generate(url, func, headers, method, version, originalurl)
 
 	local meta = {
 		__index = function(tab,ind)
+		--print("HELLOOOO, ", ind, utils[ind])
 		if utils[ind] then 
 			local proxy = {}
 			proxy.__env = env 
@@ -131,16 +132,20 @@ function page.generate(url, func, headers, method, version, originalurl)
 
 
 	local rets = {xpcall(function() return func(url, newh, method, version, env) end, debug.traceback )}
-	local ok = rets[1]
+	local ok = true -- rets[1]
 	local err = rets[2]
+	print(ok, err)
 	local headers, status
-	if not ok and err then 
+	--[[if not ok and err then 
 		prettyprint.write("pagegen", "error", "error parsing " .. url .. ": " .. err)
 		return ""
-	else 
+	else --]]
 		headers = env.returnheaders
 		status = env.status
-	end
+	--end
+
+	print("NEWBUF: ", newbuf, newbuf.buffer:len())
+	print("HTML ", html, html.buffer:len(), html.buffer)
 	return newbuf.buffer, headers, status
 end
 
