@@ -30,9 +30,6 @@ html.tagdata = {
 }
 
 function html:write(str)
-	print("the write", self)
-	debug.traceback()
-	print(debug.traceback())
 	local root = self.__bufferlocation
 	root.buffer = root.buffer .. str 
 end 
@@ -137,7 +134,6 @@ local fcontext = {
 	--	print(origval)
 
 		if tab == getfenv() or tab == rawget(tab, "objectroot") and origval then 
-			print("ret original")
 			return origval
 		end
 		--if rawget(tab, "__isroot") then 
@@ -204,7 +200,6 @@ function html:new()
 	o.objectroot = o
 	o.__isroot = true
 	o.__bufferlocation = o
-	print("USING OBJECT:" , o)
 	return setmetatable(o, 
 		fcontext
 	)

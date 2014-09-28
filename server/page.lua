@@ -89,7 +89,7 @@ function page.generate(url, func, headers, method, version, originalurl)
 	}
 	setmetatable(env, meta)
 
-	local funcwrapmeta = {__index=function(tab,ind) print("find "..ind, newbuf.buffer, env[ind], thisenv[ind]) return env[ind] or thisenv[ind] end}
+	local funcwrapmeta = {__index=function(tab,ind)  return env[ind] or thisenv[ind] end}
 
 	env.require = function(name)
 		local data = {require(name)}
@@ -134,7 +134,7 @@ function page.generate(url, func, headers, method, version, originalurl)
 	local rets = {xpcall(function() return func(url, newh, method, version, env) end, debug.traceback )}
 	local ok = true -- rets[1]
 	local err = rets[2]
-	print(ok, err)
+
 	local headers, status
 	--[[if not ok and err then 
 		prettyprint.write("pagegen", "error", "error parsing " .. url .. ": " .. err)
@@ -144,8 +144,6 @@ function page.generate(url, func, headers, method, version, originalurl)
 		status = env.status
 	--end
 
-	print("NEWBUF: ", newbuf, newbuf.buffer:len())
-	print("HTML ", html, html.buffer:len(), html.buffer)
 	return newbuf.buffer, headers, status
 end
 

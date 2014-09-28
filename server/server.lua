@@ -157,9 +157,9 @@ function server:handlerequest(page, method, version, clock, options)
 				rq = http.response(302, {["Location"] = "/index.lua"}, "")--]]
 			else
 				local content, headers,status, filetype = self:getpage(page, options, method, version, clock)
-				print(headers)
+
 				local headers = headers or http.getnewheader()
-				print(headers, headers["Content-Type"], self.ctypes[filetype], filetype)
+
 				if headers and  not headers["Content-Type"] and self.ctypes[filetype] then
 					headers["Content-Type"] = self.ctypes[filetype] 
 				end 
