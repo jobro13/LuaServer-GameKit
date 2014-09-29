@@ -1,0 +1,134 @@
+p {
+	padding: 10px;
+  
+}
+
+a {
+	font-family: Lato;
+	font-weight: 100;
+	color: #99BBBB;
+	text-decoration: none;
+	padding-bottom: 2px;
+	border-bottom: 3px solid #88A3A3;
+}
+
+a:hover{
+	border-bottom: 3px solid #A8C5C5;
+	color: #B8DDDD;
+}
+
+header {
+	height: 90px;
+}
+
+.logo {
+	color: rgb(220,220,220);
+	height: 100%;
+	margin: 0px;
+	background: #466368;
+	width: 100%;
+	border-bottom: 8px solid #668388;
+	text-shadow: 2px 2px 1px rgba(50,50,50,1);
+	float: left;
+}
+
+a.nvlink {
+	margin-right: 10px;
+	margin-left: 10px;
+	padding-bottom: 5px;
+	font-size: 20px;
+	border-bottom: 4px solid #668388;
+	text-shadow: 2px 2px 1px rgba(50,50,50,1);
+}
+
+nav {
+
+	float: left;
+
+	margin: 20px;
+
+}
+
+h1 {
+	font-family: Arial;
+	font-weight: 100;
+	text-align: center;
+}
+
+
+.pagetitlebox {
+	float: left;
+	border-right: 8px solid #668388;
+	height: 100%;
+	width: auto;
+	padding: 0 0px;
+	margin: 0;
+}
+
+div.floatl = {
+	float: left;
+}
+div.floatr = {
+	float: right;
+}
+
+div.clearboth {
+	clear: both;
+}
+
+.pagetitle {
+	font-family: Lato;
+	font-weight: 100;
+	text-align: center;
+	
+	padding: 0px;
+
+	margin:  0 5%;
+	font-size: 40px;
+
+}
+
+.pageundertitle {
+	font-family: Lato;
+	font-weight: 100;
+	text-align: center;
+	margin: 0 0%;
+	padding: 10px;
+	font-size: 20px;
+	white-space: nowrap;
+
+}
+
+.ghnoticebox {
+	position: relative;
+	font-family: Lato;
+	float: right;
+	width: 20%;
+	min-height: 100%;
+	border: none;
+	border-left: 8px solid #668388;
+	
+	margin: 0px;
+	height: 100%;
+	padding-left: 10px;
+}
+
+.ghnotice = {
+	font-family: Lato;
+	margin: 5px;
+	padding-left: 20px;
+}
+
+body {
+	padding: 0px;
+	margin: 0px;
+	height: 100%;
+	background-color: #BBD8DD;
+}
+
+html {
+	height: 100%;
+	padding: 0;
+}
+
+

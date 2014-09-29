@@ -98,7 +98,6 @@ function routing:findroute(sign)
 		end
 	end
 	scan(self.routes, 1)
-	print("new root for " .. sign .. " is: ", deep, newroot)
 	return deep, newroot
 end 
 
