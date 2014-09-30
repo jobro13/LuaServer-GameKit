@@ -19,5 +19,16 @@ I will provide a plugin so queries can be sent while preprocessing HTML.
 Query Syntax
 ============
 
-`use *dbname*`
+NOTE: These queries are going to be put in a "database" plugin for web pages.
+Usage for that will be provided.
+In most case the function to call is the plugin method of that function name, plus arguments. This builds a buffer for our database which is released upon request. New requests are created via a function which also has to be called first.
+
+`use <dbname>`
+ Notifies LDBS that we want to use the dbname. This can be a path, seen from root. (we just io.open it)
+ Using any database manipulations without specifiying a database will result in an error.
+
+`create <dbname>`
+Creates a new database. If it exists, do nothing. dbname can be a path.
+
+`
 
