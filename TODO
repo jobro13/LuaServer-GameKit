@@ -1,0 +1,7 @@
+To complete a game of Werewolves we need:
+
+Backend:
+-> Database management
+--> This will run as local network server on the pc
+--> You send commands over an interface to the db manager which will parse those
+--> You always specify the database password.
