@@ -1,12 +1,18 @@
 local md5 = require "md5"
 local server = require "server"
 local copas = require "copas"
+local lfs = require "lfs"
 
 local db = {}
 
 db.root = "./database"
 db.IP = "127.0.0.1"
 db.Port = 3391
+
+-- basic commands:
+-- use <tablename>; (seeks in this table)
+-- find <condition>
+--> this condition has its own syntax (YAY)
 
 -- every command should be raw sent using tcp or udp;
 --> every newline denotes a new command
