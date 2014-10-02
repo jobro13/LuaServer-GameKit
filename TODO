@@ -5,3 +5,14 @@ Backend:
 --> This will run as local network server on the pc
 --> You send commands over an interface to the db manager which will parse those
 --> You always specify the database password.
+
+
+Database:
+-> Define databases
+-> Define data types (equal, ineqaual)
+-> Define primary keys for loops to other dbs
+-> Define insertion functions
+-> Define change functions
+
+All tables should be able to be crawled via Lua tables
+At the start of a server, a password for the database is asked. This will be used to login to the database.
