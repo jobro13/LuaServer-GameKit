@@ -75,7 +75,7 @@ function page.generate(url, func, headers, method, version, originalurl)
 
 	local meta = {
 		__index = function(tab,ind)
-		--print("HELLOOOO, ", ind, utils[ind])
+
 		if utils[ind] then 
 			local proxy = {}
 			proxy.__env = env 

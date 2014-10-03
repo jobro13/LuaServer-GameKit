@@ -41,10 +41,6 @@ end
 --  Name is the object name
 
 function html:optparse(optlist,Parent,Name, bufo)
-	-- this has to be done in order.
-	-- so we cant use pairs 
-
-	-- REMOVE ENTRIES FROM TABLE?
 	local opened = false
 	local wrotespace = false
 	if optlist.open then -- also include an open tag
@@ -58,7 +54,6 @@ function html:optparse(optlist,Parent,Name, bufo)
 		fclose = true;
 	}	
 	-- okay now we are done!
-	--print(Name)
 	local partbuff = ""
 	for i,v in pairs(optlist) do 
 		if not got[i] then 
@@ -91,98 +86,77 @@ end
 
 local fcontext = {}
 
-	fcontext.__call = function(tab,...)
-	--	print("call " .. tab.Name, rawget(tab, "call"))
-		local args = {...}
-		local o = tab.objectroot
-		local options = args[1]
-		--print "call"
-		if type(options) == "string" then
-			options = {content = options}
-		end
-
-	
-		if rawget(tab, "call") then 
-			args = {...}
-			args[#args+1] = o.objectroot
-			tab.call(o,unpack(args))
-			return 
-		end
-		--local write = rawget(getfenv(), "write")
-		if tab.Name == "close" then 
-			-- add closing tags..
-			local upname = tab.Parent
-			if type(options) == "table" then 
-				-- force close.
-				options.fclose = true
-			
-				o:optparse(options, upname.Parent, upname.Name)
-			else 
-				o:optparse({fclose = true}, upname.Parent, upname.Name)
-			end
-		elseif tab.Name == "full" then 
-			local options = options or {}
-			options.open = true
-			tab.Parent.close(options)
-		elseif tab.Name == "open" then
-			local options = options or {} 
-			options.open=true
-			o:optparse(options, tab.Parent.Parent, tab.Parent.Name)
-		else
-			o:optparse(options or {}, tab.Parent, tab.Name)
-		end
+fcontext.__call = function(tab,...)
+	local args = {...}
+	local o = tab.objectroot
+	local options = args[1]
+	if type(options) == "string" then
+		options = {content = options}
 	end
-	-- environment variable can be "hacked in" via getmetatable
-	-- this is to pass the "right" buffer to the explicit object
-	fcontext.__index = function(tab, val, environment)
+	
+	if rawget(tab, "call") then 
+		args = {...}
+		args[#args+1] = o.objectroot
+		tab.call(o,unpack(args))
+		return 
+	end
+	--local write = rawget(getfenv(), "write")
+	if tab.Name == "close" then 
+		-- add closing tags..
+		local upname = tab.Parent
+		if type(options) == "table" then 
+			-- force close.
+			options.fclose = true
 		
-		if rawget(tab, "objectroot") then
-		--print(rawget(tab, "objectroot"), val)
-			end
- 		local origval = rawget(getfenv(), val) 
-	--	print(origval)
-
-
-
-		if tab == getfenv() or tab == rawget(tab, "objectroot") and origval then 
-			return origval
+			o:optparse(options, upname.Parent, upname.Name)
+		else 
+			o:optparse({fclose = true}, upname.Parent, upname.Name)
 		end
-		--if rawget(tab, "__isroot") then 
-		local raw = rawget(html, val)
-			if raw then 
-				if type(raw) == "table" and rawget(raw, "__isexplicit") == true then 
-
-					--print(val)
-					local o = rawget(html,val)
-					local newo = {objectroot = tab.objectroot, call = raw.call}
-					local meta = {
-					__newindex = fcontext.__newindex,
-					__index = function(tab, ind)
-						print(ind)
-						return rawget(newo, ind) or o[ind] 
-					end,
-					__call = fcontext.__call
-					}
-					print("found something")
-					setmetatable(newo, meta)
-					return newo
-				else 
-					return raw 
-				end 
-			end
-	
-	--	print("I want a new index name " .. val )
-		--local newf = rawget(getfenv(), "newf")
-
-
-		return html.newf(tab,val,tab)
-	
+	elseif tab.Name == "full" then 
+		local options = options or {}
+		options.open = true
+		tab.Parent.close(options)
+	elseif tab.Name == "open" then
+		local options = options or {} 
+		options.open=true
+		o:optparse(options, tab.Parent.Parent, tab.Parent.Name)
+	else
+		o:optparse(options or {}, tab.Parent, tab.Name)
 	end
+end
+-- environment variable can be "hacked in" via getmetatable
+-- this is to pass the "right" buffer to the explicit object
+fcontext.__index = function(tab, val, environment)	
+ 	local origval = rawget(getfenv(), val) 
 
-	fcontext.__newindex = function(tab,ind,val)
-		rawset(tab,ind,val)
+	if tab == getfenv() or tab == rawget(tab, "objectroot") and origval then 
+		return origval
 	end
+	local raw = rawget(html, val)
+		if raw then 
+			if type(raw) == "table" and rawget(raw, "__isexplicit") == true then 
+				local o = rawget(html,val)
+				local newo = {objectroot = tab.objectroot, call = raw.call}
+				local meta = {
+				__newindex = fcontext.__newindex,
+				__index = function(tab, ind)
+					return rawget(newo, ind) or o[ind] 
+				end,
+				__call = fcontext.__call
+				}
 
+				setmetatable(newo, meta)
+				return newo
+			else 
+				return raw 
+			end 
+		end
+	return html.newf(tab,val,tab)
+
+end
+fcontext.__newindex = function(tab,ind,val)
+	rawset(tab,ind,val)
+end
 
 --[[function fcontext.__newindex(tab, index, value)
 	if type(value) == "function" then 
@@ -191,7 +165,7 @@ local fcontext = {}
 end--]]
 
 function html:newf(name, location, options, isexplicit)
-	--print("Creating new O: " .. name)
+
 	if not name then 
 		err("Name not provided")
 		return 
@@ -216,21 +190,17 @@ end
 
 local content = html:newf("content", html, nil, true)
 function content:call(c)
-
 	self.objectroot:write(c)
-	print("yup we got root")
 end
 
 local doctype = html:newf("doctype", html, nil, true)
 function doctype:call(dtype)
 	self.objectroot:write("<!DOCTYPE " ..dtype ..">")
-	print(self)
-	print("yes call doctype")
+
 end
 
 html.objectroot=html
 html.__bufferlocation = html
-print(html)
 
 function html:new()
 	local o = {buffer = ""}
