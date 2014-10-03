@@ -92,6 +92,9 @@ function page.generate(url, func, headers, method, version, originalurl)
 	local funcwrapmeta = {__index=function(tab,ind)  return env[ind] or thisenv[ind] end}
 
 	env.require = function(name)
+		if package.loaded[name] and package.loaded[name].forcereload then 
+			package.loaded[name] = nil 
+		end 
 		local data = {require(name)}
 
 		if type(data[1]) == "function" then 
