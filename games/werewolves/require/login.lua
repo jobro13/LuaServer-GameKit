@@ -7,6 +7,7 @@ div.open {class = "button green left", content = "Login"}
 div.close()
 div.open {class = "button blue right", content = "Register"}
 div.close()
+div.close()
 end
 
 return login

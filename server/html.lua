@@ -4,6 +4,8 @@
 
 local html = {}
 
+html.newline = true -- set to false to obfuscate html (*cough*)
+
 local prettyprint = require "prettyprint"
 
 function err(msg)
@@ -71,16 +73,19 @@ function html:optparse(optlist,Parent,Name, bufo)
 	end
 	if partbuff ~= "" or optlist.open then 
 		partbuff = partbuff .. ">"
+		if self.newline then 
+			partbuff = partbuff .. "\n"
+		end
 		self:write(partbuff)
 	end
 	if optlist.content then 
-		self:write(optlist.content)
+		self:write(optlist.content .. ((self.newline and "\n") or ""))
 	end
 
 	if optlist.close then 
-		self:write("</"..Name..">")
+		self:write("</"..Name..">" .. ((self.newline and "\n") or ""))
 	elseif optlist.fclose then 
-		self:write("</"..Name..">")
+		self:write("</"..Name..">" .. ((self.newline and "\n") or ""))
 	end
 end
 
@@ -190,12 +195,12 @@ end
 
 local content = html:newf("content", html, nil, true)
 function content:call(c)
-	self.objectroot:write(c)
+	self.objectroot:write(c .. ((self.objectroot.newline and "\n") or ""))
 end
 
 local doctype = html:newf("doctype", html, nil, true)
 function doctype:call(dtype)
-	self.objectroot:write("<!DOCTYPE " ..dtype ..">")
+	self.objectroot:write("<!DOCTYPE " ..dtype ..">"..((self.objectroot.newline and "\n") or ""))
 
 end
 
