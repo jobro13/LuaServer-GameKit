@@ -1,9 +1,0 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title> sample </title>
-</head>
-<body>
-<b> hi </b>
-</body>
-</html>

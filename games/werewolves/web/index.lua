@@ -22,7 +22,7 @@ section.open()
 login:write()
 section.close()
 
-
+content "fuck"
 
 --[[section.open()
 b.full "Welcome to full moon"

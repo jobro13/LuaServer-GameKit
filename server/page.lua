@@ -68,7 +68,7 @@ function page.generate(url, func, headers, method, version, originalurl)
 		originalurl = originalurl or url;
 		returnheaders = http.getnewheader();
 		status = 200;
-		objecroot = newbuf;
+		objectroot = newbuf;
 	}	
 
 	local thisenv = getfenv()
@@ -134,7 +134,9 @@ function page.generate(url, func, headers, method, version, originalurl)
 	local rets = {xpcall(function() return func(url, newh, method, version, env) end, debug.traceback )}
 	local ok = true -- rets[1]
 	local err = rets[2]
-
+	if err then 
+		prettyprint.write("pagegen", "error", err)
+	end
 
 	local headers, status
 	--[[if not ok and err then 

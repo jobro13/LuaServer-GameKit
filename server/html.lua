@@ -89,8 +89,9 @@ function html:optparse(optlist,Parent,Name, bufo)
 	end
 end
 
-local fcontext = {
-	__call = function(tab,...)
+local fcontext = {}
+
+	fcontext.__call = function(tab,...)
 	--	print("call " .. tab.Name, rawget(tab, "call"))
 		local args = {...}
 		local o = tab.objectroot
@@ -130,13 +131,14 @@ local fcontext = {
 		else
 			o:optparse(options or {}, tab.Parent, tab.Name)
 		end
-	end,
+	end
 	-- environment variable can be "hacked in" via getmetatable
 	-- this is to pass the "right" buffer to the explicit object
-	__index = function(tab, val, environment)
+	fcontext.__index = function(tab, val, environment)
 		
-
-
+		if rawget(tab, "objectroot") then
+		--print(rawget(tab, "objectroot"), val)
+			end
  		local origval = rawget(getfenv(), val) 
 	--	print(origval)
 
@@ -146,8 +148,27 @@ local fcontext = {
 			return origval
 		end
 		--if rawget(tab, "__isroot") then 
-			if rawget(html, val) then 
-				return html[val]
+		local raw = rawget(html, val)
+			if raw then 
+				if type(raw) == "table" and rawget(raw, "__isexplicit") == true then 
+
+					--print(val)
+					local o = rawget(html,val)
+					local newo = {objectroot = tab.objectroot, call = raw.call}
+					local meta = {
+					__newindex = fcontext.__newindex,
+					__index = function(tab, ind)
+						print(ind)
+						return rawget(newo, ind) or o[ind] 
+					end,
+					__call = fcontext.__call
+					}
+					print("found something")
+					setmetatable(newo, meta)
+					return newo
+				else 
+					return raw 
+				end 
 			end
 	
 	--	print("I want a new index name " .. val )
@@ -156,11 +177,12 @@ local fcontext = {
 
 		return html.newf(tab,val,tab)
 	
-	end,
-	__newindex = function(tab,ind,val)
+	end
+
+	fcontext.__newindex = function(tab,ind,val)
 		rawset(tab,ind,val)
 	end
-}
+
 
 --[[function fcontext.__newindex(tab, index, value)
 	if type(value) == "function" then 
@@ -179,7 +201,7 @@ function html:newf(name, location, options, isexplicit)
 	o.Parent = location
 	o.objectroot = self
 	o.__bufferlocation = self.__bufferlocation
-	o.__isexplicit = (isexplicit == true or nil)
+	o.__isexplicit = ((isexplicit == true) or nil)
 	if options and type(options) == "table" then 
 		for i,v in pairs(options) do 
 			o[i] = v
@@ -193,19 +215,22 @@ end
 
 
 local content = html:newf("content", html, nil, true)
-function content:call(c, root)
+function content:call(c)
 
-	root:write(c)
-
+	self.objectroot:write(c)
+	print("yup we got root")
 end
 
 local doctype = html:newf("doctype", html, nil, true)
 function doctype:call(dtype)
 	self.objectroot:write("<!DOCTYPE " ..dtype ..">")
+	print(self)
+	print("yes call doctype")
 end
 
 html.objectroot=html
 html.__bufferlocation = html
+print(html)
 
 function html:new()
 	local o = {buffer = ""}

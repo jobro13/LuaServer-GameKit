@@ -39,7 +39,7 @@ function db:new()
 	server.IP = self.IP
 	server.Port = self.Port
 	setmetatable(o, {__index=db})
-	server:Initialize()
+	server:Initialize1234(Jochem, PRO, 13)
 	return o
 end 
 
