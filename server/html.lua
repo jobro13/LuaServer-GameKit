@@ -102,7 +102,9 @@ local fcontext = {
 
 	
 		if rawget(tab, "call") then 
-			tab.call(o,...)
+			args = {...}
+			args[#args+1] = o.objectroot
+			tab.call(o,unpack(args))
 			return 
 		end
 		--local write = rawget(getfenv(), "write")
@@ -129,9 +131,16 @@ local fcontext = {
 			o:optparse(options or {}, tab.Parent, tab.Name)
 		end
 	end,
-	__index = function(tab, val)
-		local origval = rawget(getfenv(), val) 
+	-- environment variable can be "hacked in" via getmetatable
+	-- this is to pass the "right" buffer to the explicit object
+	__index = function(tab, val, environment)
+		
+
+
+ 		local origval = rawget(getfenv(), val) 
 	--	print(origval)
+
+
 
 		if tab == getfenv() or tab == rawget(tab, "objectroot") and origval then 
 			return origval
@@ -159,7 +168,7 @@ local fcontext = {
 	end
 end--]]
 
-function html:newf(name, location, options)
+function html:newf(name, location, options, isexplicit)
 	--print("Creating new O: " .. name)
 	if not name then 
 		err("Name not provided")
@@ -170,6 +179,7 @@ function html:newf(name, location, options)
 	o.Parent = location
 	o.objectroot = self
 	o.__bufferlocation = self.__bufferlocation
+	o.__isexplicit = (isexplicit == true or nil)
 	if options and type(options) == "table" then 
 		for i,v in pairs(options) do 
 			o[i] = v
@@ -182,12 +192,14 @@ end
 
 
 
-local content = html:newf("content", html)
-function content:call(c)
-	self.objectroot:write(c)
+local content = html:newf("content", html, nil, true)
+function content:call(c, root)
+
+	root:write(c)
+
 end
 
-local doctype = html:newf("doctype", html)
+local doctype = html:newf("doctype", html, nil, true)
 function doctype:call(dtype)
 	self.objectroot:write("<!DOCTYPE " ..dtype ..">")
 end

@@ -30,5 +30,12 @@ In most case the function to call is the plugin method of that function name, pl
 `create <dbname>`
 Creates a new database. If it exists, do nothing. dbname can be a path.
 
-`
+`rowspec <rowspec>`
+specifies row layout for the database
+ex
+rowspec
+id = number
+text = string;
+
+
 

@@ -26,6 +26,7 @@ server.webdir = settings:get "webdir"
 
 server.home = settings:get "page_home"
 server["404"] = settings:get "page_404"
+server.Reuse = true 
 
 
 server.ctypes = {
@@ -49,6 +50,7 @@ end
 
 function server:Initialize()
 	self.socket = socket.tcp()
+	self.socket:setoption("reuseaddr",true)
 	prettyprint.write("server", "info", "Starting server on " .. self.IP .. ":" .. self.Port)
 	local ok, err = self.socket:bind(self.IP, self.Port)
 	if ok then 

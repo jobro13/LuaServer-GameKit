@@ -68,7 +68,7 @@ function page.generate(url, func, headers, method, version, originalurl)
 		originalurl = originalurl or url;
 		returnheaders = http.getnewheader();
 		status = 200;
-
+		objecroot = newbuf;
 	}	
 
 	local thisenv = getfenv()
@@ -84,7 +84,7 @@ function page.generate(url, func, headers, method, version, originalurl)
 			rawset(tab,ind,myproxy)
 			return myproxy
 		end
-		return newbuf[ind]
+		return rawget(newbuf, ind) or getmetatable(newbuf).__index(newbuf,ind,env)
 	end
 	}
 	setmetatable(env, meta)
@@ -134,6 +134,7 @@ function page.generate(url, func, headers, method, version, originalurl)
 	local rets = {xpcall(function() return func(url, newh, method, version, env) end, debug.traceback )}
 	local ok = true -- rets[1]
 	local err = rets[2]
+
 
 	local headers, status
 	--[[if not ok and err then 
