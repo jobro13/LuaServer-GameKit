@@ -1,3 +1,5 @@
+urlencoding.parseurl()
+
 doctype "html"
 html.open()
 head.open()

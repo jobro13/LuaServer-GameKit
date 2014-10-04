@@ -19,7 +19,7 @@ a.full {href = "/chat.lua", content = "Chat", class = "nvlink"}
 nav.close()
 
 div.open {class = "ghnoticebox"}
-p.open {content = "by Jochem Brouwer", class = "ghnotice"}
+p.open {content = "by Jobro", class = "ghnotice"}
 br.open()
 a.full {href = "https://github.com/jobro13/LuaServer-GameKit", content = "Fork me on GitHub!" }
 p.close()

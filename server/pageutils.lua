@@ -13,5 +13,6 @@ local function add(name, location)
 end 
 
 add("cookie")
+add("urlencoding")
 
 return ret 
