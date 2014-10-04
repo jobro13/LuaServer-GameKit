@@ -155,15 +155,15 @@ end
 
 function page.tryroute(server,url,root,headers,method,version)
 			local routing = server.routing
-			local route, newroot = routing:findroute(url)
+			local route, newroot, forced = routing:findroute(url)
 			
 			if route or newroot then 
-				return page.get(server, route or url, newroot or root, headers, method, version, true, url)
+				return page.get(server, route or url, newroot or root, headers, method, version, true, url, forced)
 			end
 
 end
 
-function page.get(server, url, root, headers, method, version, blockrecurse, originalurl)
+function page.get(server, url, root, headers, method, version, blockrecurse, originalurl, dontcheckorig)
 	-- pagegen detector stuff here
 	local file_location = root .. url
 	local typeof = file_location:match("(%.%w+)$")
@@ -171,7 +171,7 @@ function page.get(server, url, root, headers, method, version, blockrecurse, ori
 	
 	if typeof == ".lua" then 
 		local func, err 
-		if originalurl and originalurl:match("(%.%w+)$") == ".lua" then 
+		if not dontcheckorig and originalurl and originalurl:match("(%.%w+)$") == ".lua" then 
 			func, err = loadfile(root .. originalurl)
 			if not func then 
 				func, err = loadfile(file_location)

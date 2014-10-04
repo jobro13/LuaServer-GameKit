@@ -20,7 +20,7 @@ end
 -- as seen from our home directory (web)
 -- if usagepage is not define,d but newroot;
 -- behaviour is that file is being looked up in newroot
-function routing:add(routename, usagepage, newroot)
+function routing:add(routename, usagepage, newroot, forced)
 	-- first check if this thing is more specific
 	-- we create a tree like that
 	-- .. hrm thats hard.
@@ -59,26 +59,27 @@ function routing:add(routename, usagepage, newroot)
 	scan(self.routes, 1)
 	if deep then 
 		if not deep.specific then 
-			deep.specific = {[pattern] = {usagepage, newroot}}
+			deep.specific = {[pattern] = {usagepage, newroot, forced}}
 		else
-			deep.specific[pattern] = {usagepage, newroot}
+			deep.specific[pattern] = {usagepage, newroot, forced}
 		end
 	end
 	if low then 
-		local my = {[pattern] = {usagepage, newroot,specific = {}}}
+		local my = {[pattern] = {usagepage, newroot, forced, specific = {}}}
 		for i,v in pairs(low) do 
 			my[pattern].specific[i] = v
 		end 
 		self.routes = my
 	end 
 	if not low and not deep then 
-		self.routes[pattern] = {usagepage, newroot}
+		self.routes[pattern] = {usagepage, newroot, forced}
 	end
 end
 
 function routing:findroute(sign)
 	local deep = nil
 	local newroot = nil
+	local forced = nil
 	local dlevel = 0
 	function scan(where, level)
 		for rname, rdata in pairs(where) do 
@@ -87,6 +88,7 @@ function routing:findroute(sign)
 					if level > dlevel then 
 						deep = rdata[1] -- usage file
 						newroot = rdata[2]
+						forced = rdata[3]
 						dlevel = level
 					end
 					-- if it does match, it can match specific patterns too!
@@ -98,7 +100,7 @@ function routing:findroute(sign)
 		end
 	end
 	scan(self.routes, 1)
-	return deep, newroot
+	return deep, newroot, forced
 end 
 
 
