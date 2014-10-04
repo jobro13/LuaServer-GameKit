@@ -203,6 +203,21 @@ html {
 
 }
 
+.loginform .lowfont {
+	font: 10px Lato;
+	padding: 0px;
+	margin: 0px;
+}
+
+.loginform .fullwidth {
+	width: 100%;
+}
+
+.loginform p {
+	padding: 0px;
+	margin: 0px;
+}
+
 .loginactions a {
 	width: 30%;
 	overflow: hidden;

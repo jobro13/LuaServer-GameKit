@@ -1,7 +1,7 @@
 local login = {}
 
 function login:write()
-form.open {class="loginform"}
+form.open {class="loginform", method = "post", action = "/processlogin.lua"}
 fieldset.open {class = "loginvalues"}
 label.open()
 content "Username"
@@ -22,7 +22,11 @@ a.close()
 form.close()
 end
 
-login.forcereload = true 
+login.forcereload = true -- < specify that this require must be
+-- reloaded EVERY time it is required
+-- so you can use it as sub-page
+-- otherwise you need to restart the server
+-- always 
 
 return login
 
