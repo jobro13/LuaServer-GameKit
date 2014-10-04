@@ -34,4 +34,6 @@ header.close()
 
 end
 
+hlib.forcereload = true
+
 return hlib
