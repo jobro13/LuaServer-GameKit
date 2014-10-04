@@ -9,11 +9,11 @@ a {
 	color: #99BBBB;
 	text-decoration: none;
 	padding-bottom: 2px;
-	border-bottom: 3px solid #88A3A3;
+	border-bottom: 2px solid #88A3A3;
 }
 
 a:hover{
-	border-bottom: 3px solid #A8C5C5;
+	border-bottom: 2px solid #A8C5C5;
 	color: #B8DDDD;
 }
 
@@ -27,7 +27,7 @@ header {
 	margin: 0px;
 	background: #466368;
 	width: 100%;
-	border-bottom: 8px solid #668388;
+	border-bottom: 3px solid #668388;
 	text-shadow: 2px 2px 1px rgba(50,50,50,1);
 	float: left;
 }
@@ -37,7 +37,7 @@ a.nvlink {
 	margin-left: 10px;
 	padding-bottom: 5px;
 	font-size: 20px;
-	border-bottom: 4px solid #668388;
+	border-bottom: 2px solid #668388;
 	text-shadow: 2px 2px 1px rgba(50,50,50,1);
 }
 
@@ -58,7 +58,7 @@ h1 {
 
 .pagetitlebox {
 	float: left;
-	border-right: 8px solid #668388;
+	border-right: 3px solid #668388;
 	height: 100%;
 	width: auto;
 	padding: 0 0px;
@@ -106,7 +106,7 @@ div.clearboth {
 	width: 20%;
 	min-height: 100%;
 	border: none;
-	border-left: 8px solid #668388;
+	border-left: 3px solid #668388;
 	
 	margin: 0px;
 	height: 100%;
@@ -129,6 +129,97 @@ body {
 html {
 	height: 100%;
 	padding: 0;
+}
+
+.loginform {
+	box-shadow: 10px 10px 5px rgba(50,50,50,0.4);
+	margin: 20px 40%;
+	border-radius: 10px;
+	border: 4px solid #668388;
+	background-color: rgb(220,220,220);
+	font: 18px Lato;
+	font-weight: 100;
+}
+
+.loginform .loginactions {
+	border-top: 2px solid #668388;
+	margin: 0px;
+	padding: 10px;
+	background-color: rgb(200,200,200);
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+
+.loginform fieldset {
+	border: 0px;
+	margin: 0px;
+
+}
+
+
+.loginform label {
+	color: #000000;
+  	font-size: 12px;
+ 	margin: 0px;
+  	margin-bottom: 10px;
+  	font: 20px Lato;
+  	font-weight: 300;
+
+}
+
+.loginform input {
+	margin-top: 6px;
+	width: 100%;
+	border-radius: 5px;
+	border: 2px solid rgb(160,160,160) ;
+	border-color: #668388;
+	font: 14px Lato;
+	font-weight: 300;
+}
+
+.loginactions .floatl {
+	float: left;
+	width: 60%;
+}
+
+.loginactions .btn {
+	background-color: rgb(120,230,120);
+	margin: 0px 20px 0px 0px;
+	border: 2px solid rgb(60,170,60);
+	height: 25px;
+}
+
+.loginactions .btn:hover{
+	background-color: rgb(100,200,100);	
+}
+
+.loginactions a {
+	font-family: Lato;
+	font-weight: 100;
+	color: #99BBBB;
+	text-decoration: none;
+	padding-bottom: 2px;
+	border-bottom: none;
+
+}
+
+.loginactions a {
+	width: 30%;
+	overflow: hidden;
+	border-radius: 5px;
+	padding: 0px 0px;
+	margin: 0px;
+	text-align: center;
+	background-color: rgb(180,230,180);
+	font: 12px Lato;
+	color: rgb(50,50,50);
+	padding: 2px;
+	border: 1px solid rgb(0,170,0);
+	font: 12px Lato;
+}
+
+.loginactions a:hover{
+	background-color: rgb(160,210,160);
 }
 
 
