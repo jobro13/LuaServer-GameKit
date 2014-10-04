@@ -58,17 +58,22 @@ function html:optparse(optlist,Parent,Name, bufo)
 	-- okay now we are done!
 	local partbuff = ""
 	for i,v in pairs(optlist) do 
-		if not got[i] then 
-			if not opened then 
-				opened = true 
-				self:write("<"..Name.." ")
-				wrotespace = true
+		if type(i) == "number" then 
+			-- wat
+			partbuff = partbuff .. " " .. v .. " "
+		else 
+			if not got[i] then 
+				if not opened then 
+					opened = true 
+					self:write("<"..Name.." ")
+					wrotespace = true
+				end
+				if not wrotespace then 
+					self:write(" ")
+					wrotespace = true
+				end
+				partbuff = partbuff .. i .. "=\""..v.."\""
 			end
-			if not wrotespace then 
-				self:write(" ")
-				wrotespace = true
-			end
-			partbuff = partbuff .. i .. "=\""..v.."\""
 		end
 	end
 	if partbuff ~= "" or optlist.open then 
