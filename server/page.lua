@@ -168,9 +168,17 @@ function page.get(server, url, root, headers, method, version, blockrecurse, ori
 	local file_location = root .. url
 	local typeof = file_location:match("(%.%w+)$")
 	local content, rheaders, status
-
+	
 	if typeof == ".lua" then 
-		local func,err = loadfile(file_location)
+		local func, err 
+		if originalurl and originalurl:match("(%.%w+)$") == ".lua" then 
+			func, err = loadfile(root .. originalurl)
+			if not func then 
+				func, err = loadfile(file_location)
+			end
+		else 
+			func,err = loadfile(file_location)
+		end
 		if err then 
 			prettyprint.write("pagegen", "error", err)
 		else 
