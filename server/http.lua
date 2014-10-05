@@ -64,36 +64,68 @@ function http.response(status,headers,content, method, page, version, clock)
 	return out
 end
 
-local chmeta = {
-	__newindex = function(tab,ind,val)
-		local target = tab.__data
-		if target[ind] then 
-			table.insert(target[ind], val)
-		else 
-			target[ind] = {val}
-		end
-	end,
-	__index = function(tab,ind)
-		return tab.__data[ind]
-	end
-}
+
 
 -- returns an empty header object
 function http.getnewheader()
+	local chmeta = {
+			__newindex = function(tab,ind,val)
+			local target = tab.__data
+
+			if target[ind] then 
+				table.insert(target[ind], val)
+			else 
+				target[ind] = {val}
+			end
+		end,
+		__index = function(tab,ind)
+			return tab.__data[ind]
+		end}
+
 		local out = {__data = {}}
 		return setmetatable(out, chmeta)
 end
 
 -- returns all header options into a table
-function http.getremheader(conn, readf, headertable)
+function http.getremheader(conn, readf)
 	local line = " "
 	local out = http.getnewheader()
-	while line and line ~= "" and line ~= "\r\n" do 
-		line = readf(conn, "*l")
+	-- oh plesae
+	local gotCL = false
+	local ContentLength = nil
+	local gotempty = false 
+	local stop = false 
+	while line and not stop do
+		if not gotempty then 
+			line = readf(conn, "*l")
+
+		elseif ContentLength then
+			line = readf(conn, ContentLength)
+			out["Content"] = line
+			break
+		else 
+			-- huh? you should not be here
+			break 
+		end
 		local option, value = line:match("^([^:]+): (.*)")
 		if option and value then 
+		
 			out[option] = value 
-		end 
+
+			if option == "Content-Length" then 
+				gotCL = true 
+				ContentLength = tonumber(value)
+			end
+		elseif line == "" then 
+			if gotCL then 
+				if gotemtpy then 
+					break 
+				end
+				gotempty = true 
+			else
+				break 
+			end 
+		end
 	end 
 	return out 
 end

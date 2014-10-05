@@ -177,6 +177,7 @@ function server:handlerequest(page, method, version, clock, options)
 end
 
 server.handle = function(self,conn, efc, tr)
+
 	self.RQs = self.RQs + 1
 	local clock = os.clock()
 	local id = self.RQs 

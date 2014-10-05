@@ -22,6 +22,8 @@ section.open()
 login:write()
 section.close()
 
+print(headers.Content and headers.Content[1], "no")
+
 --[[section.open()
 b.full "Welcome to full moon"
 
