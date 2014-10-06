@@ -26,11 +26,12 @@ function db:new()
 	function myserver:handle(conn, efc, tr)
 		local data 
 		repeat 
-			if data then 
+			if data and data ~= "" then 
 				self:parse(data)
 			end
 			data = copas.receive(conn, "*l")
 			-- parse data
+			print("lol", data)
 		until not data
 	end 
 
@@ -38,8 +39,9 @@ function db:new()
 	o.server = myserver 
 	server.IP = self.IP
 	server.Port = self.Port
-	setmetatable(o, {__index=db})
-	server:Initialize1234(Jochem, PRO, 13)
+	setmetatable(o, {__index= function(tab,ind) return db[ind] or myserver[ind] end})
+	server:Initialize()
+	copas.addserver(myserver.socket, function(...) myserver.handle(self, ...) end)
 	return o
 end 
 
