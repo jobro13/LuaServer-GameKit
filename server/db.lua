@@ -15,7 +15,7 @@ db.commands = {}
 
 function db.commands:create(name)
 	lfs.chdir(self.root)
-	io.open(name)
+	io.open(name, "w")
 end 
 
 -- basic commands:
