@@ -5,9 +5,18 @@ local lfs = require "lfs"
 
 local db = {}
 
-db.root = "./database"
+local root = lfs.currentdir()
+
+db.root = lfs.currentdir() .. "/database"
 db.IP = "127.0.0.1"
 db.Port = 3391
+
+db.commands = {}
+
+function db.commands:create(name)
+	lfs.chdir(self.root)
+	io.open(name)
+end 
 
 -- basic commands:
 -- use <tablename>; (seeks in this table)
@@ -16,22 +25,34 @@ db.Port = 3391
 
 -- every command should be raw sent using tcp or udp;
 --> every newline denotes a new command
-function db:parse(command, args)
 
+-- changes the root of the directory to where
+-- looking from our root
+function db:changedir(where, nonrelative)
+	lfs.chdir(self.root.."/" .. where)
 end 
 
-function db:new()
+
+function db:parse(command, args)
+	if self.commands[command] then 
+		self.commands[command](self, args)
+	else 
+		-- return error 
+	end
+end 
+
+function db:new(root)
 	local myserver = server:new()
+	local dbroot = nil
 	-- memfixes here
 	function myserver:handle(conn, efc, tr)
 		local data 
 		repeat 
 			if data and data ~= "" then 
-				self:parse(data)
+
+				self:parse(data:match("(%S+)%s(.*)"))
 			end
 			data = copas.receive(conn, "*l")
-			-- parse data
-			print("lol", data)
 		until not data
 	end 
 
