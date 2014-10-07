@@ -24,10 +24,53 @@ end
 
 db.commands = {}
 
-function db.commands:create(name)
+function db.commands:create(rest)
 	lfs.chdir(self.root)
-	io.open(name, "w")
+	local collumns = {}
+	local colldata, maincoll
+	local name = rest[1] 
+	if not name then 
+		return "Specify a database name"
+	end 
+
+	for i,v in pairs(rest) do 
+		if v:match("collinfo:") then 
+			colldata = rest[i+1]
+		elseif v:match("main:") then 
+			maincoll = rest[i+1]
+		end 
+	end 
+
+	-- start splitting 
+	local collumndata = {}
+	for match in string.gmatch(colldata, "(%w+)") do 
+		table.insert(collumndata, match)
+	end 
+
+	if #collumndata == 0 then 
+		return false, "Error parsing collumn data: did not find any data"
+	end 
+
+	if not colldata then 
+		return false, "Did not find any collumn data"
+	end 
+
+
+	local file = io.open(name..".ldb", "w") -- lua db
+	file:write("Collumn specification:\n")
+	file:write("Collumns: " .. #collumndata .."\n")
+	for i,v in pairs(collumndata) do 
+		file:write(v.."\n")
+	end 
+
+	file:write("Collspec end\n")
+	file:flush()
+	file:close()
+
+	return true, "Database created succesfully"
 end 
+
+ 
 
 -- basic commands:
 -- use <tablename>; (seeks in this table)
@@ -48,10 +91,14 @@ function db:parse(command, remstr)
 		return 
 	end 
 
+
 	if remstr then remstr = " " .. remstr  end
 
+	local args = argsplit(remstr)
+
+
 	if self.commands[command] then 
-		self.commands[command](self, args)
+		print(self.commands[command](self, args))
 	else 
 		-- return error 
 	end
@@ -66,7 +113,6 @@ function db:new(root)
 		repeat 
 			if data and data ~= "" then 
 				for cmd, rem in data:gmatch("(%w+)([^;]-);") do
-					print("COMMAND", cmd, "REM", rem)
 					if cmd then 
 						self:parse(cmd,rem)
 					end
@@ -80,7 +126,7 @@ function db:new(root)
 	o.server = myserver 
 	server.IP = self.IP
 	server.Port = self.Port
-	setmetatable(o, {__index= function(tab,ind) return db[ind] or myserver[ind] end})
+	setmetatable(o, {__index= function(tab,ind) print(ind, db[ind]) return db[ind] or myserver[ind] end})
 	server:Initialize()
 	copas.addserver(myserver.socket, function(...) myserver.handle(self, ...) end)
 	return o
