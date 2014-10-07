@@ -11,6 +11,17 @@ db.root = lfs.currentdir() .. "/database"
 db.IP = "127.0.0.1"
 db.Port = 3391
 
+local function argsplit(argstr)
+	local out = {}
+	if not argstr then 
+		return out 
+	end 
+	for match in string.gmatch(argstr, "%s(%S+)") do 
+		table.insert(out,match)
+	end 
+	return out 
+end
+
 db.commands = {}
 
 function db.commands:create(name)
@@ -32,8 +43,13 @@ function db:changedir(where, nonrelative)
 	lfs.chdir(self.root.."/" .. where)
 end 
 
+function db:parse(command, remstr)
+	if not command then 
+		return 
+	end 
 
-function db:parse(command, args)
+	if remstr then remstr = remstr .. " " end
+
 	if self.commands[command] then 
 		self.commands[command](self, args)
 	else 
@@ -49,8 +65,10 @@ function db:new(root)
 		local data 
 		repeat 
 			if data and data ~= "" then 
-
-				self:parse(data:match("(%S+)%s(.*)"))
+				local cmd, rem = data:match("(%S+)(%s.*)")
+				if cmd then 
+					self:parse(cmd,rem)
+				end
 			end
 			data = copas.receive(conn, "*l")
 		until not data
