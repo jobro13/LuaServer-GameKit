@@ -48,7 +48,7 @@ function db:parse(command, remstr)
 		return 
 	end 
 
-	if remstr then remstr = remstr .. " " end
+	if remstr then remstr = " " .. remstr  end
 
 	if self.commands[command] then 
 		self.commands[command](self, args)
@@ -65,9 +65,11 @@ function db:new(root)
 		local data 
 		repeat 
 			if data and data ~= "" then 
-				local cmd, rem = data:match("(%S+)(%s.*)")
-				if cmd then 
-					self:parse(cmd,rem)
+				for cmd, rem in data:gmatch("(%w+)([^;]-);") do
+					print("COMMAND", cmd, "REM", rem)
+					if cmd then 
+						self:parse(cmd,rem)
+					end
 				end
 			end
 			data = copas.receive(conn, "*l")
