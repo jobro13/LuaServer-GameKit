@@ -23,19 +23,18 @@ NOTE: These queries are going to be put in a "database" plugin for web pages.
 Usage for that will be provided.
 In most case the function to call is the plugin method of that function name, plus arguments. This builds a buffer for our database which is released upon request. New requests are created via a function which also has to be called first.
 
-`use <dbname>`
- Notifies LDBS that we want to use the dbname. This can be a path, seen from root. (we just io.open it)
- Using any database manipulations without specifiying a database will result in an error.
-
-`create <dbname>`
+`create <dbname> <collinfo>`
 Creates a new database. If it exists, do nothing. dbname can be a path.
+Collinfo is in the following format:
 
-`rowspec <rowspec>`
-specifies row layout for the database
-ex
-rowspec
-id = number
-text = string;
+create test collinfo: id,name,score main: id;
+NO SPACES!
+If main: is not preset, choses first specified collumn as main row. This is used as key to find the data.
+
+`insert <insdata> in <database name>`
+inserts data into the database 
+insdata is as following:
+rowname=[datalen]data,rowname=[datalen]data ..
 
 
 

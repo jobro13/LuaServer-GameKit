@@ -59,6 +59,19 @@ function db.commands:create(rest)
 	local file = io.open(name..".ldb", "w") -- lua db
 	file:write("Collumn specification:\n")
 	file:write("Collumns: " .. #collumndata .."\n")
+	if maincoll then 
+		local found = false 
+		for i,v in pairs(collumndata) do 
+			if v == maincoll then 
+				found = true 
+				break 
+			end 
+		end 
+		if not found then
+			return false, "Specified main collumn, but this doesnt exist in the collumn info list!"
+		end 
+		file:write("Main: "..main)
+	end 
 	for i,v in pairs(collumndata) do 
 		file:write(v.."\n")
 	end 
