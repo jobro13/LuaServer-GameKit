@@ -24,6 +24,13 @@ end
 
 db.commands = {}
 
+-- get returns a row specified in rname. 
+-- database interface plugin can be used to figure out what data is 
+-- in it (will be created as table)
+function db.commands:get(rname)
+
+end 
+
 function db.commands:insert(rest)
 	local gotdb 
 	local dbname
@@ -49,9 +56,27 @@ function db.commands:insert(rest)
 			table.insert(data, {rowname, datalen, writedata})
 		end
 	end 
+	-- inserts @ end
 	for i,v in pairs(data) do 
 		print(v[1], v[2], v[3])
 	end 
+	local file, err = io.open(dbname, "r")
+	-- this is fucking ugly
+	file:read("*l")
+	file:read("*l")
+	local str = file:read("*l")
+	local length = str:len() 
+	local csize = str:match("Rows used: (%d+)")
+	if not csize then 
+		return false, "Database corrupted: rows used not found"
+	end 
+	local newstr = "Rows used: "..csize+1
+	file:seek("cur", -length)
+	file:write(newstr)
+	if not file then 
+		return false, err 
+	end 
+
 	if not gotdb then 
 		return false, "Specify database name"
 	end 
@@ -89,9 +114,11 @@ function db.commands:create(rest)
 	end 
 
 
+
 	local file = io.open(name..".ldb", "w") -- lua db
 	file:write("Collumn specification:\n")
 	file:write("Collumns: " .. #collumndata .."\n")
+	file:write("Rows used: 0\n")
 	if maincoll then 
 		local found = false 
 		for i,v in pairs(collumndata) do 
