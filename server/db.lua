@@ -29,13 +29,13 @@ function db.commands:insert(rest)
 	local dbname
 	local data = {} 
 	for i,v in pairs(rest) do 
-		print(i)
-		if i == "in" then 
+		print(v)
+		if v == "in" then 
 			dbname = rest[i+1]
 			if dbname then 
 				gotdb = true 
 			end 
-		elseif i == "=" then 
+		elseif v == "=" then 
 			local rowname = rest[i-1]
 			local datalen = rest[i+1]
 			local writedata = rest[i+2]
