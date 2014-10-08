@@ -24,6 +24,39 @@ end
 
 db.commands = {}
 
+function db.commands:insert(rest)
+	local gotdb 
+	local dbname
+	local data = {} 
+	for i,v in pairs(rest) do 
+		print(i)
+		if i == "in" then 
+			dbname = rest[i+1]
+			if dbname then 
+				gotdb = true 
+			end 
+		elseif i == "=" then 
+			local rowname = rest[i-1]
+			local datalen = rest[i+1]
+			local writedata = rest[i+2]
+			if not rowname or not datalen or not data then 
+				return false, "Wrong data supplied"
+			elseif writedata:sub(writedata:len(), writedata:len()) == "," then 
+				writedata = writedata:sub(1,writedata:len()-1)
+			else 
+				return false, "Wrong data supplied"
+			end 
+			table.insert(data, {rowname, datalen, writedata})
+		end
+	end 
+	for i,v in pairs(data) do 
+		print(v[1], v[2], v[3])
+	end 
+	if not gotdb then 
+		return false, "Specify database name"
+	end 
+end 
+
 function db.commands:create(rest)
 	lfs.chdir(self.root)
 	local collumns = {}
