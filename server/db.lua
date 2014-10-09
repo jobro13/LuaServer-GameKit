@@ -60,7 +60,10 @@ function db.commands:insert(rest)
 	for i,v in pairs(data) do 
 		print(v[1], v[2], v[3])
 	end 
-	local file, err = io.open(dbname, "r")
+	local file, err = io.open(self.root.."/"..dbname, "r")
+	if err then 
+		return false, err 
+	end 
 	-- this is fucking ugly
 	file:read("*l")
 	file:read("*l")
@@ -86,10 +89,14 @@ function db.commands:insert(rest)
 
 	-- this naively guesses that the first collumn is an id
 	-- doesnt check for collumns, just guesses this is right.
-	local out = "["..tostring(csize):len().."] " .. csize
+	local out = "["..tostring(csize):len().."] " .. csize.."; "
 	for i,v in pairs(data) do 
-		out = out .. "["..tostring(v[1]):len().."] " .. v[3]
+		out = out .. "["..tostring(v[1]):len().."] " .. v[3] .. "; "
 	end 
+	print(out)
+	print(file:write(out .. "\n"))
+	file:close()
+	return true, "Written succesfully"
 end 
 
 function db.commands:create(rest)
