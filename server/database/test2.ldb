@@ -1,6 +1,8 @@
 Collumn specification:
 Collumns: 3
+Rows used: 0
+Main: id
+main
 id
-name
-score
-Collspec end..
+test
+Collspec end

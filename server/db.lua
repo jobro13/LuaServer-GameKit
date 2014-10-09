@@ -46,7 +46,7 @@ function db.commands:insert(rest)
 			local rowname = rest[i-1]
 			local datalen = rest[i+1]
 			local writedata = rest[i+2]
-			if not rowname or not datalen or not data then 
+			if not rowname or not datalen or not writedata then 
 				return false, "Wrong data supplied"
 			elseif writedata:sub(writedata:len(), writedata:len()) == "," then 
 				writedata = writedata:sub(1,writedata:len()-1)
@@ -65,6 +65,8 @@ function db.commands:insert(rest)
 	file:read("*l")
 	file:read("*l")
 	local str = file:read("*l")
+	-- move to EOF
+	file:seek("end")
 	local length = str:len() 
 	local csize = str:match("Rows used: (%d+)")
 	if not csize then 
@@ -75,10 +77,18 @@ function db.commands:insert(rest)
 	file:write(newstr)
 	if not file then 
 		return false, err 
-	end 
+	end
+
 
 	if not gotdb then 
 		return false, "Specify database name"
+	end 
+
+	-- this naively guesses that the first collumn is an id
+	-- doesnt check for collumns, just guesses this is right.
+	local out = "["..tostring(csize):len().."] " .. csize
+	for i,v in pairs(data) do 
+		out = out .. "["..tostring(v[1]):len().."] " .. v[3]
 	end 
 end 
 
@@ -92,12 +102,17 @@ function db.commands:create(rest)
 	end 
 
 	for i,v in pairs(rest) do 
+		print(v)
 		if v:match("collinfo:") then 
 			colldata = rest[i+1]
 		elseif v:match("main:") then 
 			maincoll = rest[i+1]
 		end 
 	end 
+
+	if not colldata or not maincoll then 
+		return false, "Wrong data supplied"
+	end
 
 	-- start splitting 
 	local collumndata = {}
@@ -130,7 +145,7 @@ function db.commands:create(rest)
 		if not found then
 			return false, "Specified main collumn, but this doesnt exist in the collumn info list!"
 		end 
-		file:write("Main: "..main)
+		file:write("Main: "..maincoll.."\n")
 	end 
 	for i,v in pairs(collumndata) do 
 		file:write(v.."\n")
