@@ -69,13 +69,14 @@ function db.commands:insert(rest)
 	file:read("*l")
 	local str = file:read("*l")
 	-- move to EOF
-	file:seek("end")
+	file:close()
+	local file, err = io.open(self.root.."/"..dbname, "a+")
 	local length = str:len() 
 	local csize = str:match("Rows used: (%d+)")
 	if not csize then 
 		return false, "Database corrupted: rows used not found"
 	end 
-	local newstr = "Rows used: "..csize+1
+	local newstr = "Rows used: "..csize+1.."\n"
 	file:seek("cur", -length)
 	file:write(newstr)
 	if not file then 
@@ -193,7 +194,7 @@ function db:parse(command, remstr)
 
 
 	if self.commands[command] then 
-		print(self.commands[command](self, args))
+		print(self.commands[command](self, args, remstr))
 	else 
 		-- return error 
 	end
