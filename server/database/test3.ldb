@@ -2,12 +2,12 @@ Collumn specification:
 Collumns: 3
 Rows used: 0
 Main: id
-main
 id
-test
+main
+str
 Collspec end
-Rows used: 1[1] 0; [4] 3; [4] he; [2] 9; 
-Rows used: 1[1] 0; [4] 3; [4] he; [2] 9; 
+Rows used: 1
+[1] 0; [4] 3; [4] he; [2] 9; 
 Rows used: 1
 [1] 0; [4] 3; [4] he; [2] 9; 
 Rows used: 1

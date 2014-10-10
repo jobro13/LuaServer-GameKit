@@ -60,7 +60,7 @@ function db.commands:insert(rest)
 	for i,v in pairs(data) do 
 		print(v[1], v[2], v[3])
 	end 
-	local file, err = io.open(self.root.."/"..dbname, "r")
+	local file, err = io.open(self.root.."/"..dbname, "r+")
 	if err then 
 		return false, err 
 	end 
@@ -68,15 +68,30 @@ function db.commands:insert(rest)
 	file:read("*l")
 	file:read("*l")
 	local str = file:read("*l")
-	-- move to EOF
-	file:close()
-	local file, err = io.open(self.root.."/"..dbname, "a+")
+	print(str, "LE WOT")
+
 	local length = str:len() 
-	local csize = str:match("Rows used: (%d+)")
+	local csize = str:match("Rows used: %s+(%d+)")
+
+	-- move back
+	file:seek("cur", -length + ("Rows used: "):len())
+
 	if not csize then 
 		return false, "Database corrupted: rows used not found"
 	end 
-	local newstr = "Rows used: "..csize+1.."\n"
+
+	local num = tostring(csize + 1)
+	local strsize = num:len()
+	local wtsize = 32-strsize
+	local fstr = string.rep(" ", wtsize) .. num 
+
+	file:write(fstr)
+
+	-- move to EOF
+	file:close()
+	local file, err = io.open(self.root.."/"..dbname, "a+")
+
+	local newstr = "Rows used: "..csize+1 .."\n"
 	file:seek("cur", -length)
 	file:write(newstr)
 	if not file then 
@@ -141,7 +156,7 @@ function db.commands:create(rest)
 	local file = io.open(name..".ldb", "w") -- lua db
 	file:write("Collumn specification:\n")
 	file:write("Collumns: " .. #collumndata .."\n")
-	file:write("Rows used: 0\n")
+	file:write("Rows used: ".. string.rep(" ", 31) .. "0", "\n")
 	if maincoll then 
 		local found = false 
 		for i,v in pairs(collumndata) do 
