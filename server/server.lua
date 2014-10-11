@@ -60,8 +60,9 @@ function server:Initialize()
 		print("Do you want to specify another port or?")
 		if io.read():sub(1,1):lower() == "y" then 
 			print("Specify port.")
-			server.Port = io.read("*n")
-			server:Initialize()
+			self.Port = io.read("*n")
+			self:Initialize()
+			return -- einsteink the hero
 		else 
 			os.exit()
 		end
