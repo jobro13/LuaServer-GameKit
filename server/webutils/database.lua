@@ -32,5 +32,19 @@ function database.create(name, rows, mainrow)
 		return false, "Some parameters were not provided"
 	end 
 	local conn = database.connect()
-	local str = "create " .. name .. " "
+	local str = "create " .. name .. " collinfo: "
+	str = str .. table.concat(rows, ",")
+	str = str:sub(1,str:len()) -- without last ,
+	local found 
+	for i,v in pairs(rows) do 
+		if v == mainrow then 
+			found = true 
+			break 
+		end 
+	end 
+	if not found then
+		return false, "Mainrow is not in rows"
+	end 
+	str = str .. " main: " .. mainrow
+	database.send(conn, str)
 end 
