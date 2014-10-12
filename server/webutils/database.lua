@@ -9,8 +9,8 @@ database.port = 3391
 -- returns a new tcp socket to write on
 function database.connect()
 	local sock = socket.tcp()
-	sock:settimeout(0.1)
-	sock:connect(database.host, database.port)
+	sock:settimeout(1)
+	print(sock:connect(database.host, database.port))
 	-- put auth shit here
 	return sock
 end 
@@ -45,6 +45,9 @@ function database.create(name, rows, mainrow)
 	if not found then
 		return false, "Mainrow is not in rows"
 	end 
-	str = str .. " main: " .. mainrow
+	str = str .. " main: " .. mainrow .. ";"
+	print(str)
 	database.send(conn, str)
 end 
+
+return database
