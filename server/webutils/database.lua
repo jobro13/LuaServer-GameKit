@@ -45,7 +45,7 @@ function database.create(name, rows, mainrow)
 	if not found then
 		return false, "Mainrow is not in rows"
 	end 
-	str = str .. " main: " .. mainrow .. ";"
+	str = str .. " main: " .. mainrow .. ";\n"
 	print(str)
 	database.send(conn, str)
 end 
