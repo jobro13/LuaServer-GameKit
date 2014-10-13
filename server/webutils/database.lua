@@ -43,10 +43,24 @@ function database.create(name, rows, mainrow)
 		end 
 	end 
 	if not found then
+		conn:close()
 		return false, "Mainrow is not in rows"
 	end 
 	str = str .. " main: " .. mainrow .. ";\n"
+	database.send(conn, str)
+end 
+
+function database.insert(data, dbname)
+	if not data or not dbname then 
+		return false, "Could not insert because not enough parameters supplied"
+	end 
+	local str = "insert " 
+	for i,v in pairs(data) do 
+		str  = str .. i .. " = [" .. (tostring(v):len()) .. "] " .. tostring(v) .. ", "
+	end 
+	str = str .. "in "..dbname..";\n"
 	print(str)
+	local conn = database.connect()
 	database.send(conn, str)
 end 
 

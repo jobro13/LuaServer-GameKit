@@ -60,7 +60,7 @@ function db.commands:insert(rest)
 	for i,v in pairs(data) do 
 		print(v[1], v[2], v[3])
 	end 
-	local file, err = io.open(self.root.."/"..dbname, "r+")
+	local file, err = io.open(self.root.."/"..dbname..".ldb", "r+")
 	if err then 
 		return false, err 
 	end 

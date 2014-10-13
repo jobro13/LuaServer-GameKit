@@ -1,3 +1,7 @@
 local db = require "webutils/database"
 
-print(db.create("test10", {"id", "test", "post"}, "post"))
+print(db.insert({
+	id = 10, 
+	post = "Hello",
+	test = true,
+	},"test10"))
