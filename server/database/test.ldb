@@ -1,0 +1,10 @@
+Collumn specification:
+Collumns: 3
+Rows used: 11111111111111111111111111111111
+Main: post
+id
+post
+test
+Collspec end
+Rows used: 1
+[1] 0; [2] 10; [4] true; [4] Hello; 

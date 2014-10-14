@@ -74,7 +74,7 @@ function db.commands:insert(rest)
 	local csize = str:match("Rows used: %s+(%d+)")
 
 	-- move back
-	file:seek("cur", -length + ("Rows used: "):len())
+	file:seek("cur", -length - 1 + ("Rows used: "):len())
 
 	if not csize then 
 		return false, "Database corrupted: rows used not found"
@@ -89,7 +89,7 @@ function db.commands:insert(rest)
 
 	-- move to EOF
 	file:close()
-	local file, err = io.open(self.root.."/"..dbname, "a+")
+	local file, err = io.open(self.root.."/"..dbname..".ldb", "a+")
 
 	local newstr = "Rows used: "..csize+1 .."\n"
 	file:seek("cur", -length)
@@ -156,7 +156,7 @@ function db.commands:create(rest)
 	local file = io.open(name..".ldb", "w") -- lua db
 	file:write("Collumn specification:\n")
 	file:write("Collumns: " .. #collumndata .."\n")
-	file:write("Rows used: ".. string.rep(" ", 31) .. "0", "\n")
+	file:write("Rows used: ".. string.rep(" ", 31) .. "0" .. "\n")
 	if maincoll then 
 		local found = false 
 		for i,v in pairs(collumndata) do 
