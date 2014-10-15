@@ -1,6 +1,8 @@
 Lua Database Documentation
 ==========================
 
+Warning: flat type database. If you hate this, close your eyes.
+
 Omg. Why.
 Because Lua, that's why. No, it won't be the fastest. I don't know. Maybe this is just to prove what Lua is capable of.
 
@@ -34,7 +36,11 @@ If main: is not preset, choses first specified collumn as main row. This is used
 `insert <insdata> in <database name>`
 inserts data into the database 
 insdata is as following:
-rowname=[datalen]data,rowname=[datalen]data ..
+rowname = [datalen] data, rowname=[datalen]data ..
+
+--> first open in w to create
+--> then open in r+ to set pos and update
+---> THIS DOES NOT INSERT, but overwrites raw bytes.
 
 
 
